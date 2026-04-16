@@ -610,8 +610,6 @@ updated: {YYYY-MM-DD}
 
 ---
 
-본문 내에 `## Changelog` 섹션을 만들지 않습니다. 변경 이력은 별도 `CHANGELOG.md` 파일로 관리합니다.
-
 ### 3-3. `docs/design-tokens/CHANGELOG.md` 작성
 
 ```markdown
