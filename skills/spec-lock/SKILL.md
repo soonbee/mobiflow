@@ -1,7 +1,6 @@
 ---
 name: spec-lock
 description: Working 상태 spec 문서를 스캔해 일괄 또는 선택적으로 commit + tag로 Lock하는 유틸리티 스킬. 사용자가 "/nidost:spec-lock", "문서 확정", "문서 Lock", "버전 확정", "커밋 + 태그"를 언급할 때 반드시 트리거하세요.
-disable-model-invocation: true
 ---
 
 # spec-lock
@@ -194,49 +193,88 @@ git diff --stat docs/{CATEGORY}/ docs/INDEX.md
 
 변경 사항이 없으면 "이미 커밋됨, 태그만 추가" 메모. 있으면 diff 요약 표시.
 
-#### 3-1-3. 커밋 메시지 요약 생성
+#### 3-1-3. 커밋 메시지 생성
 
-CHANGELOG.md의 `## {VERSION}` 블록에서 첫 번째 불릿을 대표 요약으로 추출합니다:
+1. **Body 추출**: CHANGELOG.md의 `## {VERSION}` 블록 본문을 추출합니다 (제목 라인 제외, 블록 끝의 공백 라인은 트림):
 
-```bash
-awk -v ver="{VERSION}" '
-  /^## / { in_block = ($0 ~ "^## " ver) }
-  in_block && /^- / { sub(/^- /, ""); print; exit }
-' docs/{CATEGORY}/CHANGELOG.md
-```
+   ```bash
+   awk -v ver="{VERSION}" '
+     /^## / {
+       if (in_block) exit
+       in_block = ($0 ~ "^## " ver "([^0-9.]|$)")
+       next
+     }
+     in_block { print }
+   ' docs/{CATEGORY}/CHANGELOG.md
+   ```
 
-결과가 없으면 기본값 `"v{VERSION} 확정"` 사용.
+2. **Subject 생성**: 추출된 Body를 읽고, **영어 imperative 형태의 짧은 subject**를 직접 생성합니다. 규칙:
+   - Conventional Commits 스타일 (동사 원형으로 시작, 소문자, 마침표 없음)
+   - 50자 이내 권장
+   - 여러 불릿이면 대표 변경 하나로 요약하거나 상위 개념으로 묶기
+   - 버전 문자열을 subject에 포함하지 않음 (태그에 이미 인코딩됨)
+
+   예시:
+   - `- 초안 작성` → `draft initial version`
+   - `- 성능 지표 섹션 추가` → `add performance metrics section`
+   - `- 오타 수정, 문구 다듬기` → `fix typos and polish wording`
+   - `- Breaking: 데이터 모델 재설계` → `redesign data model` (breaking change는 `!` 접미사 사용: `docs(prd)!: redesign data model`)
+
+3. **Fallback**: CHANGELOG 블록이 비어있거나 추출 실패 시
+   - Subject: `lock v{VERSION}`
+   - Body: (생략)
+
+4. **최종 메시지 구조**:
+   ```
+   docs({CATEGORY}): {SUBJECT}
+
+   {BODY}
+   ```
 
 #### 3-1-4. 확인 (선택 모드에 따라)
 
 - **일괄 모드 (STEP 2B-3의 1/2번)**: 확인 없이 진행. 다만 최초 1회에 한해 전체 요약 프롬프트:
+
   ```
   아래 순서로 Lock을 진행합니다:
-    - prd@0.1.0 → "docs(prd): v0.1.0 - 초안 작성"
-    - user-journey@0.1.0 → "docs(user-journey): v0.1.0 - 초안 작성"
-    - architecture@0.2.0 → "docs(architecture): v0.2.0 - 부가 컴포넌트 추가"
+    - prd@0.1.0 → "docs(prd): draft initial version"
+    - user-journey@0.1.0 → "docs(user-journey): draft user journey"
+    - architecture@0.2.0 → "docs(architecture): add auxiliary components"
 
   1. 진행
   2. 종료
   ```
+
 - **개별 확인 모드 (STEP 2B-3의 3번 또는 STEP 2A 단일 모드)**: 각 항목마다 확인:
+
   ```
   {CATEGORY}@{VERSION} Lock 준비됨
-    커밋 메시지: docs({CATEGORY}): v{VERSION} - {SUMMARY}
-    태그:        doc/{CATEGORY}/v{VERSION}
+    Subject: docs({CATEGORY}): {SUBJECT}
+    Body:    (CHANGELOG v{VERSION} 블록 본문, N줄)
+    Tag:     doc/{CATEGORY}/v{VERSION} (annotated; 커밋 메시지와 동일)
 
   1. 진행
-  2. 요약 수정 (자유 입력)
+  2. Subject 수정 (자유 입력, 영어 imperative 권장)
   3. 건너뛰기
   4. 전체 중단
   ```
 
 #### 3-1-5. 커밋 + 태그 수행
 
+Body가 있는 경우:
+
 ```bash
 git add docs/{CATEGORY}/ docs/INDEX.md
-git commit -m "docs({CATEGORY}): v{VERSION} - {SUMMARY}"
-git tag doc/{CATEGORY}/v{VERSION} -m "{SUMMARY}"
+git commit -m "docs({CATEGORY}): {SUBJECT}" -m "{BODY}"
+git tag -a doc/{CATEGORY}/v{VERSION} -m "docs({CATEGORY}): {SUBJECT}" -m "{BODY}"
+```
+
+Body가 없는 경우 (fallback):
+
+```bash
+git add docs/{CATEGORY}/ docs/INDEX.md
+git commit -m "docs({CATEGORY}): lock v{VERSION}"
+git tag -a doc/{CATEGORY}/v{VERSION} -m "docs({CATEGORY}): lock v{VERSION}"
 ```
 
 커밋할 변경이 없으면 `git commit`은 건너뛰고 tag만 수행.
