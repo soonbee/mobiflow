@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # init
 
-빈 디렉토리에 git-flow 브랜치 전략과 최소 스캐폴딩(README, Makefile, .gitignore, docs/doc-guide.md)을 생성합니다. 앱/DB/프레임워크 선택은 이 스킬이 관여하지 않으며, 이후 `ideation`, `spec-*` 단계에서 결정됩니다.
+빈 디렉토리에 git-flow 브랜치 전략과 최소 스캐폴딩(README, Makefile, .gitignore, docs/doc-guide.md)을 생성합니다. 앱/DB/프레임워크 선택은 이 스킬이 관여하지 않으며, 이후 `spec-prd`, `spec-*` 단계에서 결정됩니다.
 
 ---
 
@@ -121,7 +121,7 @@ hotfix/*   ← 긴급 수정 브랜치 (from main → main+develop 머지)
     - README.md
     - docs/doc-guide.md
 
-다음 스킬: nidost:ideation
+다음 스킬: nidost:spec-prd
 ```
 
 ---
@@ -130,5 +130,5 @@ hotfix/*   ← 긴급 수정 브랜치 (from main → main+develop 머지)
 
 - 이 스킬은 **빈 디렉토리에서만** 동작합니다. 기존 프로젝트 마이그레이션은 지원하지 않습니다.
 - 앱 스캐폴딩(`apps/mobile`, `apps/backend` 등), DB 셋업(`db/`), CI 워크플로우(`.github/workflows/`)는 생성하지 않습니다. 각각 해당 단계의 전용 스킬이 담당합니다.
-- `docs/doc-guide.md`는 사용자 프로젝트의 문서 규칙이며, 필요 시 이 파일을 직접 수정하여 조정할 수 있습니다. 이후 `ideation` 등 문서를 작성하는 스킬은 이 파일을 참조합니다.
+- `docs/doc-guide.md`는 사용자 프로젝트의 문서 규칙이며, 필요 시 이 파일을 직접 수정하여 조정할 수 있습니다. 이후 `spec-prd` 등 문서를 작성하는 스킬은 이 파일을 참조합니다.
 - git 명령 실패 시 에러 메시지와 원인을 설명하고 수동 해결 방법을 안내합니다.

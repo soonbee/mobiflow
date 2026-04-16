@@ -95,7 +95,7 @@ test -f docs/prd/prd.md
 
 없으면 다음 메시지를 출력하고 종료:
 
-> ❌ `docs/prd/prd.md`를 찾을 수 없습니다. 먼저 `/nidost:ideation`으로 PRD를 작성해주세요.
+> ❌ `docs/prd/prd.md`를 찾을 수 없습니다. 먼저 `/nidost:spec-prd`로 PRD를 작성해주세요.
 
 PRD 파일을 읽어 frontmatter의 `version` 필드를 추출합니다. frontmatter가 없거나 `version` 필드가 누락/형식 오류인 경우 다음 메시지를 출력하고 종료:
 

@@ -1,10 +1,10 @@
 ---
-name: ideation
-description: 모호한 아이디어를 PRD 초안으로 구체화하는 스킬. 사용자가 "/nidost:ideation", "PRD 작성", "아이디어 구체화", "제품 기획", "ideation 시작"을 언급할 때 반드시 트리거하세요.
+name: spec-prd
+description: 모호한 아이디어를 PRD 초안으로 구체화하는 스킬. 사용자가 "/nidost:spec-prd", "PRD 작성", "아이디어 구체화", "제품 기획", "PRD 초안 작성"을 언급할 때 반드시 트리거하세요.
 disable-model-invocation: true
 ---
 
-# ideation
+# spec-prd
 
 당신은 시니어 PM이자 전담 페이스메이커입니다. 추상적 아이디어를 실행 가능한 PRD로 전환하는 것이 유일한 사명입니다. 코드를 작성하는 대신 제품의 핵심 로직과 시장 전략을 정의하는 데 집중합니다.
 
@@ -195,7 +195,7 @@ updated: {YYYY-MM-DD}
 모든 파일 생성이 끝나면 아래 형식으로 보고합니다:
 
 ```
-✅ nidost ideation 완료
+✅ nidost spec-prd 완료
 
   프로젝트:   {PROJECT_NAME}
   문서:       docs/prd/prd.md (v0.1.0)
