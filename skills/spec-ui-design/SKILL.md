@@ -464,30 +464,25 @@ STEP 2 인터뷰에서 결정된 축과 PRD·user-journey·architecture·design-
 
 ---
 
-## STEP 4: 완료 보고
+## STEP 4: 완료 보고 및 Lifecycle 결정
 
-모든 파일 생성이 끝나면 아래 형식으로 보고합니다:
+모든 파일 생성을 마친 뒤 아래 형식으로 완료 요약을 표시한 다음, `doc-guide.md`의 「작성 완료 Lifecycle 프롬프트」 절차를 수행합니다.
 
 ```
-✅ nidost ui-design 완료
+✅ nidost ui-design v0.1.0 작성 완료
 
-  문서:               docs/ui-design/ui-design.md (v0.1.0)
+  문서:               docs/ui-design/ui-design.md
   기준 PRD:           docs/prd/prd.md (v{PRD_VERSION})
   기준 User Journey:  docs/user-journey/user-journey.md (v{UJ_VERSION})
   기준 Architecture:  docs/architecture/architecture.md (v{ARCH_VERSION})
   기준 Design Tokens: docs/design-tokens/design-tokens.md (v{DT_VERSION})
-  CHANGELOG:          docs/ui-design/CHANGELOG.md
+  CHANGELOG:          docs/ui-design/CHANGELOG.md 갱신
   INDEX:              docs/INDEX.md 갱신
 
-다음 단계(수동 커밋):
-  git add docs/ui-design docs/INDEX.md
-  git commit -m "docs(ui-design): v0.1.0 - 초안 작성"
-  git tag doc/ui-design/v0.1.0 -m "초안 작성"
-
-다음 스킬: nidost:spec-db-design
+다음 스킬 후보: nidost:spec-db-design
 ```
 
-커밋과 태그는 이 스킬에서 직접 수행하지 않습니다.
+요약 직후 「작성 완료 Lifecycle 프롬프트」의 3-way 선택(Lock / Working 유지 종료 / 추가 편집)을 제시하고, 사용자 선택에 따라 해당 절차를 그대로 따릅니다.
 
 ---
 
@@ -496,7 +491,7 @@ STEP 2 인터뷰에서 결정된 축과 PRD·user-journey·architecture·design-
 - 기존 파일의 상태(Working/Lock)에 따라 STEP 0 동작이 분기됩니다. Lock 상태 수정은 `doc-guide.md`의 「Lock 상태 수정 프로토콜」, Working 편집은 「Working 상태 편집 규칙」을 따릅니다. 초기화가 필요하면 수동으로 `rm -rf docs/<category>/` 후 재호출합니다.
 - 저장 경로는 `docs/ui-design/ui-design.md`로 고정됩니다.
 - 최초 버전은 항상 `0.1.0`으로 시작합니다.
-- `git commit`·`git tag`는 사용자 수동 단계입니다.
+- Lock(commit + tag)은 `/nidost:spec-lock` 스킬이 담당합니다. 본 스킬은 직접 수행하지 않습니다.
 - 인터뷰는 **필요 시에만** 진행합니다. PRD·user-journey·architecture·design-tokens에서 자명하게 도출되는 결정은 인터뷰 없이 자동 결정하고 §8 결정 로그에 `(자동 선택)` 표기를 남깁니다.
 
 ---

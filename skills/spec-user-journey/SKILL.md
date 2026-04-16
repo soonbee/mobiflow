@@ -282,27 +282,22 @@ frontmatter 아래에 STEP 2에서 작성한 페르소나별 시나리오를 그
 
 ---
 
-## STEP 4: 완료 보고
+## STEP 4: 완료 보고 및 Lifecycle 결정
 
-모든 파일 생성이 끝나면 아래 형식으로 보고합니다:
+모든 파일 생성을 마친 뒤 아래 형식으로 완료 요약을 표시한 다음, `doc-guide.md`의 「작성 완료 Lifecycle 프롬프트」 절차를 수행합니다.
 
 ```
-✅ nidost user-journey 완료
+✅ nidost user-journey v0.1.0 작성 완료
 
-  문서:       docs/user-journey/user-journey.md (v0.1.0)
+  문서:       docs/user-journey/user-journey.md
   기준 PRD:   docs/prd/prd.md (v{PRD_VERSION})
-  CHANGELOG:  docs/user-journey/CHANGELOG.md
+  CHANGELOG:  docs/user-journey/CHANGELOG.md 갱신
   INDEX:      docs/INDEX.md 갱신
 
-다음 단계(수동 커밋):
-  git add docs/user-journey docs/INDEX.md
-  git commit -m "docs(user-journey): v0.1.0 - 초안 작성"
-  git tag doc/user-journey/v0.1.0 -m "초안 작성"
-
-다음 스킬: nidost:spec-architecture
+다음 스킬 후보: nidost:spec-architecture
 ```
 
-커밋과 태그는 이 스킬에서 직접 수행하지 않습니다. 사용자가 내용을 리뷰한 뒤 위 명령을 실행합니다.
+요약 직후 「작성 완료 Lifecycle 프롬프트」의 3-way 선택(Lock / Working 유지 종료 / 추가 편집)을 제시하고, 사용자 선택에 따라 해당 절차를 그대로 따릅니다.
 
 ---
 
@@ -311,7 +306,7 @@ frontmatter 아래에 STEP 2에서 작성한 페르소나별 시나리오를 그
 - 기존 파일의 상태(Working/Lock)에 따라 STEP 0 동작이 분기됩니다. Lock 상태 수정은 `doc-guide.md`의 「Lock 상태 수정 프로토콜」, Working 편집은 「Working 상태 편집 규칙」을 따릅니다. 초기화가 필요하면 수동으로 `rm -rf docs/<category>/` 후 재호출합니다.
 - 저장 경로는 `docs/user-journey/user-journey.md`로 고정됩니다.
 - 최초 버전은 항상 `0.1.0`으로 시작합니다.
-- `git commit`·`git tag`는 사용자 수동 단계입니다.
+- Lock(commit + tag)은 `/nidost:spec-lock` 스킬이 담당합니다. 본 스킬은 직접 수행하지 않습니다.
 - 페르소나 추론(자동 생성 모드)은 반드시 사용자 confirm 후에만 진행합니다.
 - 페르소나 자동 생성 시 1~3명으로 강제합니다. PRD에 페르소나가 명시된 경우는 PRD 정의를 그대로 따릅니다.
 
