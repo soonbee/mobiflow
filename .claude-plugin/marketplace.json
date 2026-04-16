@@ -1,0 +1,16 @@
+{
+  "name": "nidost",
+  "version": "0.1.0",
+  "description": "Spec-driven development workflow marketplace.",
+  "owner": {
+    "name": "soonbee"
+  },
+  "plugins": [
+    {
+      "name": "nidost",
+      "version": "0.1.0",
+      "description": "Spec-driven development workflow with skills and sub-agents (PRD → design → ticketing → TDD → review → QA).",
+      "source": "./"
+    }
+  ]
+}
