@@ -77,17 +77,15 @@ based_on:
 
 nidost 기획·설계 체인의 카테고리별 필수 의존은 아래와 같다. 각 spec 스킬은 이 테이블의 필수 의존을 `based_on`에 반드시 포함해야 한다.
 
-| 카테고리         | 필수 의존                                      | 선택 의존       |
-| ---------------- | ---------------------------------------------- | --------------- |
-| `prd`            | —                                              | —               |
-| `user-journey`   | `prd`                                          | —               |
-| `architecture`   | `prd`                                          | —               |
-| `design-tokens`  | `prd`                                          | —               |
-| `ui-design`      | `prd`, `user-journey`, `architecture`          | `design-tokens` |
-| `db-design`      | `prd`, `architecture`                          | —               |
-| `api-design`     | `prd`, `architecture`, `db-design`             | —               |
-
-선택 의존은 로드된 경우에만 `based_on`에 포함한다.
+| 카테고리         | 필수 의존                                                       |
+| ---------------- | --------------------------------------------------------------- |
+| `prd`            | —                                                               |
+| `user-journey`   | `prd`                                                           |
+| `architecture`   | `prd`                                                           |
+| `design-tokens`  | `prd`                                                           |
+| `ui-design`      | `prd`, `user-journey`, `architecture`, `design-tokens`          |
+| `db-design`      | `prd`, `architecture`                                           |
+| `api-design`     | `prd`, `architecture`, `db-design`                              |
 
 ---
 
