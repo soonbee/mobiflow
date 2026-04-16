@@ -128,20 +128,18 @@ db-design 파일을 읽어 frontmatter의 `version` 필드를 추출합니다. f
 test -f docs/api-design/api-design.md
 ```
 
-존재하면 사용자에게 다음과 같이 묻고 응답을 대기합니다:
+존재하면 `doc-guide.md`의 「문서 수정 프로토콜」에 따라 사용자에게 다음과 같이 묻고 응답을 대기합니다:
 
-> ⚠️ `docs/api-design/api-design.md`가 이미 존재합니다.
+> ⚠️ `docs/api-design/api-design.md` (v{기존버전})가 이미 존재합니다.
 >
-> 기존 파일을 삭제하고 새로 작성할까요? 기존 내용을 유지한 채 부분 수정하려면 파일을 직접 편집해주세요.
->
-> 1. 삭제 후 재작성 (v0.1.0 새로 시작, 기존 CHANGELOG도 삭제)
-> 2. 종료
->
-> *git 히스토리에 이전 버전이 보존되므로 별도 백업은 필요하지 않습니다.*
+> 1. 수정 (특정 섹션 갱신 또는 전체 재생성)
+> 2. 초기화 (v0.1.0 새로 시작, 기존 CHANGELOG도 삭제)
+> 3. 종료
 
-- **1번 선택**: 기존 `docs/api-design/api-design.md`와 `docs/api-design/CHANGELOG.md`를 삭제하고 STEP 1로 진행
-- **2번 선택**(또는 그 외 응답): 종료
-- 1번 선택 후 삭제는 다음 명령으로 수행:
+- **1번 선택**: 문서 수정 프로토콜의 수정 모드로 진입
+- **2번 선택**: 기존 `docs/api-design/api-design.md`와 `docs/api-design/CHANGELOG.md`를 삭제하고 STEP 1로 진행
+- **3번 선택**(또는 그 외 응답): 종료
+- 2번 선택 후 삭제는 다음 명령으로 수행:
 
   ```bash
   rm -f docs/api-design/api-design.md docs/api-design/CHANGELOG.md
@@ -502,7 +500,7 @@ STEP 1-4 자동 도출 결과와 STEP 2 인터뷰 결과를 모두 기록한다.
 
 ## 주의사항
 
-- 이 스킬은 **신규 api-design 최초 작성 전용**입니다. 기존 파일이 있으면 STEP 0에서 사용자에게 "삭제 후 재작성" 여부만 묻고, 부분 수정은 지원하지 않습니다.
+- 기존 파일이 있으면 STEP 0에서 수정/초기화/종료를 선택합니다. 수정 모드는 `doc-guide.md`의 「문서 수정 프로토콜」을 따릅니다.
 - 저장 경로는 `docs/api-design/api-design.md`로 고정됩니다.
 - 최초 버전은 항상 `0.1.0`으로 시작합니다.
 - `git commit`·`git tag`는 사용자 수동 단계입니다.
