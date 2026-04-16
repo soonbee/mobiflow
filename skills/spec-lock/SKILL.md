@@ -195,7 +195,9 @@ git diff --stat docs/{CATEGORY}/ docs/INDEX.md
 
 #### 3-1-3. 커밋 메시지 생성
 
-1. **Body 추출**: CHANGELOG.md의 `## {VERSION}` 블록 본문을 추출합니다 (제목 라인 제외, 블록 끝의 공백 라인은 트림):
+커밋 메시지는 Subject·Body 모두 **영어**로 작성합니다. CHANGELOG 파일의 원본 언어(통상 한국어)는 유지되며, 커밋 시점에만 번역을 수행합니다.
+
+1. **CHANGELOG 블록 추출**: CHANGELOG.md의 `## {VERSION}` 블록 본문을 추출합니다 (제목 라인 제외, 블록 끝의 공백 라인은 트림). 이 블록은 Subject·Body 생성의 원재료입니다:
 
    ```bash
    awk -v ver="{VERSION}" '
@@ -208,7 +210,7 @@ git diff --stat docs/{CATEGORY}/ docs/INDEX.md
    ' docs/{CATEGORY}/CHANGELOG.md
    ```
 
-2. **Subject 생성**: 추출된 Body를 읽고, **영어 imperative 형태의 짧은 subject**를 직접 생성합니다. 규칙:
+2. **Subject 생성**: 추출된 블록을 읽고, **영어 imperative 형태의 짧은 subject**를 직접 생성합니다. 규칙:
    - Conventional Commits 스타일 (동사 원형으로 시작, 소문자, 마침표 없음)
    - 50자 이내 권장
    - 여러 불릿이면 대표 변경 하나로 요약하거나 상위 개념으로 묶기
@@ -220,11 +222,27 @@ git diff --stat docs/{CATEGORY}/ docs/INDEX.md
    - `- 오타 수정, 문구 다듬기` → `fix typos and polish wording`
    - `- Breaking: 데이터 모델 재설계` → `redesign data model` (breaking change는 `!` 접미사 사용: `docs(prd)!: redesign data model`)
 
-3. **Fallback**: CHANGELOG 블록이 비어있거나 추출 실패 시
+3. **Body 생성**: 추출된 블록의 **각 불릿을 영어로 번역**해 Body를 구성합니다. 원본의 불릿 구조(순서·들여쓰기·섹션 소제목)는 그대로 유지하고 내용만 영어로 옮깁니다. **CHANGELOG.md 파일 자체는 수정하지 않습니다** — 원본 언어 유지.
+
+   예시 (원본 CHANGELOG 블록 → Body):
+
+   원본:
+   ```
+   - 초안 작성
+   - 페르소나 2종 정의
+   ```
+
+   Body:
+   ```
+   - draft initial content
+   - define two personas
+   ```
+
+4. **Fallback**: CHANGELOG 블록이 비어있거나 추출 실패 시
    - Subject: `lock v{VERSION}`
    - Body: (생략)
 
-4. **최종 메시지 구조**:
+5. **최종 메시지 구조**:
    ```
    docs({CATEGORY}): {SUBJECT}
 

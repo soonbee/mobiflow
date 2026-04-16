@@ -502,13 +502,17 @@ docs(<카테고리>): <영어 imperative subject>
 ```
 docs(prd): reflect new payment requirement
 
-- 결제 수단 추가 요구사항 반영
-- 정책 매트릭스 v2 업데이트
+- add new payment method requirement
+- update policy matrix to v2
 ```
 
 ```
 docs(api-design): add websocket notification endpoints
 ```
+
+### 언어
+
+커밋 Subject와 Body는 **항상 영어**로 작성한다. CHANGELOG.md 파일 원본은 프로젝트의 도메인 언어(예: 한국어)를 유지할 수 있으며, `/nidost:spec-lock`이 커밋 생성 시점에 번역을 수행한다.
 
 ### Subject 규칙
 
