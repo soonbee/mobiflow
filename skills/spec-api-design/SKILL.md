@@ -527,7 +527,9 @@ STEP 1-4 자동 도출 결과와 STEP 2 인터뷰 결과를 모두 기록한다.
   CHANGELOG:         docs/api-design/CHANGELOG.md 갱신
   INDEX:             docs/INDEX.md 갱신
 
-다음 스킬 후보: nidost:ticket
+다음 단계: /nidost:run-draft-from-spec (draft phase)
+
+draft phase는 모든 프로젝트가 동일하게 거칩니다. UI가 없거나 ui-design §0 A2형으로 스킵된 프로젝트는 draft phase 내부에서 자동 스킵·종료되므로, 사용자가 분기를 판단할 필요는 없습니다.
 ```
 
 요약 직후 「작성 완료 Lifecycle 프롬프트」의 3-way 선택(Lock / Working 유지 종료 / 추가 편집)을 제시하고, 사용자 선택에 따라 해당 절차를 그대로 따릅니다.
