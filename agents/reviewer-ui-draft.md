@@ -18,8 +18,8 @@ You explicitly do not auto-trigger rebuilds based on subjective impressions. Aes
 ## Review Process
 
 1. List all `docs/ui-drafts/SCR-xxx/` directories and match them against `ui-design.md` §1. Note any missing or extra screens
-2. Verify `_shared/` structure (tokens.css, aesthetic.md, partials/, includer.js)
-3. For each screen, apply the strong-findings checklist in `review-ui-draft`
+2. Verify `_shared/` structure (tokens.css, aesthetic.md, partials/, templates/, includer.js). For mobile viewports, confirm `templates/scr-mobile.html` and `partials/phone-shell.css` exist
+3. For each screen, apply the strong-findings checklist in `review-ui-draft` — including the **프레임 일관성** subset: root tag/class, viewport meta, required link order, and status-bar/home-indicator include positions must match the template exactly across all SCR `index.html` and `variants/*.html`
 4. Apply cross-screen consistency checks (partial usage, tone alignment)
 5. Write commentary notes per screen (1–3 sentences each) as observations, not commands
 
