@@ -190,27 +190,22 @@ updated: {YYYY-MM-DD}
 
 ---
 
-## STEP 4: 완료 보고
+## STEP 4: 완료 보고 및 Lifecycle 결정
 
-모든 파일 생성이 끝나면 아래 형식으로 보고합니다:
+모든 파일 생성을 마친 뒤 아래 형식으로 완료 요약을 표시한 다음, `docs/doc-guide.md`의 「작성 완료 Lifecycle 프롬프트」 절차를 수행합니다.
 
 ```
-✅ nidost spec-prd 완료
+✅ nidost spec-prd v0.1.0 작성 완료
 
   프로젝트:   {PROJECT_NAME}
-  문서:       docs/prd/prd.md (v0.1.0)
+  문서:       docs/prd/prd.md
   CHANGELOG:  docs/prd/CHANGELOG.md
   INDEX:      docs/INDEX.md 갱신
 
-다음 단계(수동 커밋):
-  git add docs/prd docs/INDEX.md
-  git commit -m "docs(prd): v0.1.0 - 초안 작성"
-  git tag doc/prd/v0.1.0 -m "초안 작성"
-
-다음 스킬: nidost:spec-user-journey
+다음 스킬 후보: nidost:spec-user-journey
 ```
 
-커밋과 태그는 이 스킬에서 직접 수행하지 않습니다. 사용자가 내용을 리뷰한 뒤 위 명령을 실행합니다.
+요약 직후 「작성 완료 Lifecycle 프롬프트」의 3-way 선택(Lock / Working 유지 종료 / 추가 편집)을 제시하고, 사용자 선택에 따라 해당 절차를 그대로 따릅니다. Lock은 `/nidost:spec-lock prd` 호출로 위임하며, 본 스킬이 직접 `git commit`·`git tag`를 실행하지 않습니다.
 
 ---
 
@@ -219,7 +214,8 @@ updated: {YYYY-MM-DD}
 - 이 스킬은 **신규 PRD 최초 작성 전용**입니다. 기존 `docs/prd/prd.md`가 있으면 STEP 0에서 차단됩니다. 후속 버전 갱신은 별도 스킬이 담당합니다.
 - 저장 경로는 `docs/prd/prd.md`로 고정됩니다.
 - 최초 버전은 항상 `0.1.0`으로 시작합니다. 버전을 임의로 올리지 않습니다.
-- `git commit`·`git tag`는 사용자 수동 단계입니다. 스킬이 git 명령을 실행하지 않습니다.
+- Lock(commit + tag)은 `/nidost:spec-lock` 스킬이 담당합니다. 본 스킬은 직접 수행하지 않습니다.
+- 추가 편집이 필요하면 「작성 완료 Lifecycle 프롬프트」의 3번 경로(섹션 단위 편집 루프)를 따릅니다. Working 버전 번호는 유지되며 CHANGELOG는 루프 종료 시점에 한 번만 정리됩니다.
 - PRD 본문 내 `## Changelog` 섹션을 만들지 않습니다. 별도 `CHANGELOG.md`가 유일한 변경 이력 소스입니다.
 
 ---
