@@ -91,8 +91,9 @@ viewports:
   - { name: desktop, width: 1440, height: 900 }
 ```
 
-- 단일 뷰포트: 캡처 파일명에서 viewport name 생략 (`screenshots/default.png`)
-- 멀티 뷰포트: `screenshots/default.{name}.png` 형식
+- 단일 뷰포트: 뷰포트 샷 `screenshots/default.png`, 풀 샷 `screenshots/default.full.png`
+- 멀티 뷰포트: 뷰포트 샷 `screenshots/default.{name}.png`, 풀 샷 `screenshots/default.full.{name}.png`
+- 풀 샷은 스크롤 비율(`scrollHeight / viewport.height`)이 1.1 초과일 때만 생성. 5 초과면 뷰포트 높이 × 5로 컷(truncated)
 
 이 값은 STEP 1 호출 프롬프트에 전달되어 `_shared/aesthetic.md` frontmatter `viewports:`에 기록되며, STEP 4 캡처 단계에서 다시 읽어 사용한다.
 
@@ -218,6 +219,8 @@ STEP 3 결과의 **수정 필요 (🔴)** 항목을 분석해 다음 분기 중 
 
 리뷰 통과(분기 A) 직후 1회 실행. 리뷰가 PNG에 의존하지 않으므로 캡처 실패가 리뷰를 차단하지 않는다. 캡처 매트릭스는 항상 전체 화면 × 전체 variants × STEP 0-4 viewports의 카르테시안 곱.
 
+각 (screen, variant, viewport)마다 **뷰포트 샷**을 기본으로 1장 찍고, 페이지 스크롤 비율(`scrollHeight / viewport.height`)이 1.1을 넘으면 **풀 샷**을 추가로 1장 찍는다. 비율이 5를 넘으면 풀 샷은 뷰포트 높이 × 5로 컷(truncated)된다. 뷰포트 샷이 primary(첫인상·썸네일), 풀 샷이 secondary(콘텐츠 완결성 보조).
+
 ### 4-1. 캡처 도구 준비
 
 `docs/ui-drafts/_shared/_tools/`에 아래 3개 파일이 없으면 레퍼런스 그대로 생성한다 (갱신 시 보존). `includer.js`와 동일한 "정전 코드, 그대로 사용" 원칙.
@@ -232,14 +235,20 @@ STEP 3 결과의 **수정 필요 (🔴)** 항목을 분석해 다음 분기 중 
 // Usage:
 //   node capture.mjs --base-url <url> --shots-root <path> [--scr SCR-xxx,SCR-yyy]
 //
-// 출력: <shots-root>/SCR-xxx/screenshots/{stem}.png
-//      또는 멀티 뷰포트일 때 {stem}.{viewport-name}.png
-// stdout: ok|fail\t<scr>/<rel> @ <viewport>\t-> <결과>
+// 출력: <shots-root>/SCR-xxx/screenshots/
+//   {stem}.png              - 뷰포트 샷 (항상, 단일 뷰포트)
+//   {stem}.{vp}.png         - 뷰포트 샷 (멀티 뷰포트)
+//   {stem}.full.png         - 풀 샷 (ratio>1.1일 때만, 단일 뷰포트). ratio>5면 5× 컷
+//   {stem}.full.{vp}.png    - 풀 샷 (ratio>1.1일 때만, 멀티 뷰포트). ratio>5면 5× 컷
+// stdout: ok|fail\t<scr>/<rel> @ <viewport>\tratio=<r>\tfull=<none|full|truncated>\t-> <viewport-path>[, <full-path>]
 
 import { chromium } from 'playwright';
 import { readFile, readdir, mkdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { join, basename, extname } from 'node:path';
+
+const SCROLL_RATIO_THRESHOLD = 1.1;
+const FULL_SHOT_HEIGHT_MULTIPLIER = 5;
 
 const args = parseArgs(process.argv.slice(2));
 if (!args['base-url'] || !args['shots-root']) {
@@ -271,7 +280,10 @@ try {
     for (const vp of viewports) {
       const r = await captureOne(browser, t, vp, baseUrl, shotsRoot, single);
       if (r.ok) {
-        console.log(`ok\t${t.scr}/${t.relPath} @ ${vp.name}\t-> ${r.outPath}`);
+        const extra = r.fullPath ? `, ${r.fullPath}` : '';
+        console.log(
+          `ok\t${t.scr}/${t.relPath} @ ${vp.name}\tratio=${r.ratio.toFixed(2)}\tfull=${r.fullKind}\t-> ${r.viewportPath}${extra}`
+        );
         ok++;
       } else {
         console.log(`fail\t${t.scr}/${t.relPath} @ ${vp.name}\t-> ${r.error}`);
@@ -343,8 +355,9 @@ async function collectTargets(root, filter) {
 
 async function captureOne(browser, t, vp, baseUrl, root, single) {
   const url = `${baseUrl}/${t.scr}/${t.relPath}`;
-  const fileName = single ? `${t.stem}.png` : `${t.stem}.${vp.name}.png`;
-  const outPath = join(root, t.scr, 'screenshots', fileName);
+  const vpSuffix = single ? '' : `.${vp.name}`;
+  const viewportPath = join(root, t.scr, 'screenshots', `${t.stem}${vpSuffix}.png`);
+  const fullPath = join(root, t.scr, 'screenshots', `${t.stem}.full${vpSuffix}.png`);
   const ctx = await browser.newContext({
     viewport: { width: vp.width, height: vp.height },
     deviceScaleFactor: 2,
@@ -352,8 +365,27 @@ async function captureOne(browser, t, vp, baseUrl, root, single) {
   const page = await ctx.newPage();
   try {
     await page.goto(url, { waitUntil: 'networkidle', timeout: 15000 });
-    await page.screenshot({ path: outPath, fullPage: true });
-    return { ok: true, outPath };
+    const ratio = await page.evaluate(
+      (vpHeight) => document.documentElement.scrollHeight / vpHeight,
+      vp.height
+    );
+    await page.screenshot({ path: viewportPath, fullPage: false });
+    let fullKind = 'none';
+    let writtenFullPath = null;
+    if (ratio > SCROLL_RATIO_THRESHOLD) {
+      if (ratio <= FULL_SHOT_HEIGHT_MULTIPLIER) {
+        await page.screenshot({ path: fullPath, fullPage: true });
+        fullKind = 'full';
+      } else {
+        await page.screenshot({
+          path: fullPath,
+          clip: { x: 0, y: 0, width: vp.width, height: vp.height * FULL_SHOT_HEIGHT_MULTIPLIER },
+        });
+        fullKind = 'truncated';
+      }
+      writtenFullPath = fullPath;
+    }
+    return { ok: true, viewportPath, fullPath: writtenFullPath, ratio, fullKind };
   } catch (err) {
     return { ok: false, error: String(err.message || err) };
   } finally {
@@ -424,7 +456,9 @@ node docs/ui-drafts/_shared/_tools/capture.mjs \
 
 ### 4-4. 결과 수집
 
-스크립트 stdout을 파싱해 ok/fail 수를 집계. 실패 항목은 화면 ID·variant·viewport·원인을 표로 보관해 STEP 5-4 완료 요약과 5-5 lifecycle 프롬프트에 반영한다.
+스크립트 stdout을 파싱해 ok/fail 수와 각 샷의 `ratio`, `full=<none|full|truncated>`를 집계한다. 실패 항목은 화면 ID·variant·viewport·원인을 표로 보관해 STEP 5-4 완료 요약과 5-5 lifecycle 프롬프트에 반영한다.
+
+`full=truncated` 항목은 "5× 뷰포트 높이 상한 적용"을 의미한다. 결함이 아니라 의도적 상한이므로 실패로 집계하지 않고 요약 비고에 표기만 한다.
 
 캡처 실패는 산출물 결함이지 빌드 결함이 아니다. 사용자가 재시도 또는 무시를 선택할 수 있도록 정보만 제공하고 자동 재빌드 트리거로 사용하지 않는다.
 
@@ -488,14 +522,21 @@ node docs/ui-drafts/_shared/_tools/capture.mjs \
 
 **입력 파싱**:
 - `ui-design.md` §1 → 화면 ID 목록 + 제목 (`{SCR}`, `{TITLE}` 자리)
-- `_shared/aesthetic.md` frontmatter `viewports:` → 첫 viewport가 썸네일 기본값(`{THUMB_VP}`), 헤더 표시(`{VP_LIST}`)
+- `_shared/aesthetic.md` frontmatter `viewports:` → 첫 viewport가 썸네일 기본값(`{THUMB_VP}`), 썸네일 aspect-ratio(`{THUMB_RATIO}` = `{width} / {height}`), 헤더 표시(`{VP_LIST}`)
 - 각 `SCR-xxx/variants/*.html` 스캔 → variant 링크
+- 각 `SCR-xxx/screenshots/default.full*.png` 존재 스캔 → full 샷 존재 여부(썸네일 제목 옆 배지 + nav full 링크)
 - 단일 뷰포트면 PNG 파일명에서 `.{viewport}` 생략 (capture.mjs와 동일 규칙)
+
+**썸네일 프레이밍 규칙**:
+- `default.png`(뷰포트 샷)가 primary 썸네일. 카드 `.thumb`의 `aspect-ratio`는 첫 뷰포트 비율(`{THUMB_RATIO}`)을 그대로 따른다
+- `object-fit: contain`으로 letterboxing 없이 꽉 차게 표시(뷰포트 샷이 이미 뷰포트 크기이므로 레터박스 발생 안 함)
+- 과거의 `cover; object-position: top` 크롭은 사용하지 않는다(뷰포트 샷 전환으로 불필요)
 
 **카드 nav 링크 규칙**:
 - `open` (index.html)
 - variant 각각 (있으면)
-- viewport별 PNG 직링크
+- viewport별 PNG 직링크(뷰포트 샷)
+- **full 직링크: `default.full*.png`가 있는 viewport에 한해서만** `full` 또는 `full:{vp}` 링크 추가
 
 **경로**: 절대 경로(`/SCR-xxx/...`) 사용 — 서버 루트 = `docs/ui-drafts/` 전제
 
@@ -511,6 +552,7 @@ node docs/ui-drafts/_shared/_tools/capture.mjs \
     :root {
       --bg: #fafafa; --card-bg: #fff; --border: #e5e5e5;
       --text: #1a1a1a; --muted: #666; --accent: #0a66c2;
+      --thumb-ratio: {THUMB_RATIO};
     }
     * { box-sizing: border-box; }
     body {
@@ -530,14 +572,20 @@ node docs/ui-drafts/_shared/_tools/capture.mjs \
       border-radius: 8px; overflow: hidden; display: flex; flex-direction: column;
     }
     .card a.thumb {
-      display: block; aspect-ratio: 9 / 16; background: #f0f0f0;
+      display: block; aspect-ratio: var(--thumb-ratio); background: #fff;
       border-bottom: 1px solid var(--border);
     }
     .card a.thumb img {
-      width: 100%; height: 100%; object-fit: cover; object-position: top; display: block;
+      width: 100%; height: 100%; object-fit: contain; object-position: top; display: block;
+      background: #fff;
     }
     .card .body { padding: 12px 14px; }
-    .card h2 { margin: 0 0 4px; font-size: 14px; font-weight: 600; }
+    .card h2 { margin: 0 0 4px; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+    .card .badge {
+      display: inline-block; padding: 1px 6px; font-size: 10px; font-weight: 500;
+      color: var(--muted); border: 1px solid var(--border); border-radius: 4px;
+      letter-spacing: 0.02em; white-space: nowrap;
+    }
     .card p { margin: 0 0 8px; font-size: 12px; color: var(--muted); }
     .card nav { display: flex; gap: 8px; flex-wrap: wrap; }
     .card nav a {
@@ -569,12 +617,13 @@ node docs/ui-drafts/_shared/_tools/capture.mjs \
     <img src="/{SCR}/screenshots/default{.THUMB_VP}.png" alt="{SCR}">
   </a>
   <div class="body">
-    <h2>{SCR} · {TITLE}</h2>
+    <h2>{SCR} · {TITLE}{SCROLL_BADGE}</h2>
     <p>{VARIANT_COUNT} variants</p>
     <nav>
       <a href="/{SCR}/index.html">open</a>
       {VARIANT_LINKS}
       {VIEWPORT_PNG_LINKS}
+      {FULL_PNG_LINKS}
     </nav>
   </div>
 </article>
@@ -583,6 +632,8 @@ node docs/ui-drafts/_shared/_tools/capture.mjs \
 - `{.THUMB_VP}`는 멀티 뷰포트일 때만 `.{이름}`을 넣고, 단일 뷰포트면 빈 문자열
 - `{VARIANT_LINKS}`: `<a href="/{SCR}/variants/{stem}.html">{stem}</a>` 반복
 - `{VIEWPORT_PNG_LINKS}`: viewport마다 `<a href="/{SCR}/screenshots/default.{vp}.png">{vp}.png</a>` (단일 뷰포트면 `default.png` 1개)
+- `{FULL_PNG_LINKS}`: `default.full*.png`가 존재하는 viewport에 한해 `<a href="/{SCR}/screenshots/default.full.{vp}.png">full:{vp}</a>` (단일 뷰포트면 `default.full.png` 링크 텍스트 `full`)
+- `{SCROLL_BADGE}`: 해당 SCR에 `default.full*.png`가 하나라도 있으면 `<span class="badge">scroll</span>`, `full=truncated`가 있으면 `<span class="badge">scroll · truncated</span>`. 없으면 빈 문자열
 - 캡처 실패한 (SCR, viewport)는 해당 PNG 링크에 `⚠️` 접두 추가
 
 ### 5-2. CHANGELOG.md 작성/갱신
@@ -677,3 +728,5 @@ updated: {YYYY-MM-DD}
 - `_shared/INDEX.html`은 STEP 5마다 자동 재생성된다 — 수동 편집은 덮어쓰임. 레이아웃 커스터마이즈가 필요하면 `_shared/preview-custom.html` 같은 별도 파일로 작성
 - `_shared/INDEX.html`은 절대 경로(`/SCR-xxx/...`)를 사용하므로 HTTP 서버 루트가 `docs/ui-drafts/`여야 한다 (preview 스크립트와 python3 http.server 안내 모두 이 루트 전제)
 - 캡처 미실행/실패 시 `_shared/INDEX.html`의 썸네일은 깨진 아이콘으로 표시된다 (정상 — 산출물 결함 아님)
+- 캡처는 (뷰포트 샷 1장) + (스크롤 비율 > 1.1일 때 풀 샷 1장)의 2패스. 풀 샷은 `scrollHeight / viewport.height`가 5를 초과하면 뷰포트 높이 × 5로 컷되어 저장된다. 가상 리스트처럼 콘텐츠가 무한히 늘어나는 화면도 최대 5× 이내로 박제되어 디스크/리뷰 부담을 통제한다
+- `default.png`는 primary 썸네일·첫인상 판단 기준, `default.full.png`는 콘텐츠 완결성 보조 자료. 리뷰어는 평론 노트 작성 시 primary를 기준으로 보고 full은 하단 접지 콘텐츠 확인 용도로 참조한다
