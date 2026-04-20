@@ -144,14 +144,14 @@ Working 리스트가 있으면 아래 선택지를 제시합니다:
 
 1. 모두 Lock (Working 문서 전부를 순서대로 처리)
 2. 선택 Lock (번호로 선택, 예: "1,3")
-3. 하나씩 확인 (각 문서마다 yes/no 확인)
-4. 종료
+3. 종료
 ```
 
 - **1번**: Working 전체를 대상 리스트로
 - **2번**: 사용자 입력 파싱 (쉼표로 구분된 번호 또는 범위) → 해당 항목들만 대상 리스트로
-- **3번**: Working 전체를 대상 후보로 하되, STEP 3에서 각각 확인 플래그 ON
-- **4번**(또는 그 외): 종료
+- **3번**(또는 그 외): 종료
+
+선택 후 확인 없이 STEP 3에서 즉시 Lock을 수행합니다.
 
 ---
 
@@ -163,7 +163,7 @@ Working 리스트가 있으면 아래 선택지를 제시합니다:
 prd → user-journey → architecture → design-tokens → db-design → api-design → ui-design
 ```
 
-대상 리스트에 없는 카테고리는 건너뜁니다. STEP 2B-3에서 "3. 하나씩 확인"을 선택한 경우 각 항목마다 STEP 3-2의 확인 프롬프트에서 진행 여부를 물어봅니다.
+대상 리스트에 없는 카테고리는 건너뜁니다. 각 항목은 커밋 전 확인 없이 바로 처리됩니다 (단일 모드·일괄 모드 공통).
 
 ### 3-1. 개별 문서 Lock 처리 (루프 내부)
 
@@ -249,35 +249,7 @@ git diff --stat docs/{CATEGORY}/ docs/INDEX.md
    {BODY}
    ```
 
-#### 3-1-4. 확인 (선택 모드에 따라)
-
-- **일괄 모드 (STEP 2B-3의 1/2번)**: 확인 없이 진행. 다만 최초 1회에 한해 전체 요약 프롬프트:
-
-  ```
-  아래 순서로 Lock을 진행합니다:
-    - prd@0.1.0 → "docs(prd): draft initial version"
-    - user-journey@0.1.0 → "docs(user-journey): draft user journey"
-    - architecture@0.2.0 → "docs(architecture): add auxiliary components"
-
-  1. 진행
-  2. 종료
-  ```
-
-- **개별 확인 모드 (STEP 2B-3의 3번 또는 STEP 2A 단일 모드)**: 각 항목마다 확인:
-
-  ```
-  {CATEGORY}@{VERSION} Lock 준비됨
-    Subject: docs({CATEGORY}): {SUBJECT}
-    Body:    (CHANGELOG v{VERSION} 블록 본문, N줄)
-    Tag:     doc/{CATEGORY}/v{VERSION} (annotated; 커밋 메시지와 동일)
-
-  1. 진행
-  2. Subject 수정 (자유 입력, 영어 imperative 권장)
-  3. 건너뛰기
-  4. 전체 중단
-  ```
-
-#### 3-1-5. 커밋 + 태그 수행
+#### 3-1-4. 커밋 + 태그 수행
 
 Body가 있는 경우:
 
@@ -297,7 +269,7 @@ git tag -a doc/{CATEGORY}/v{VERSION} -m "docs({CATEGORY}): lock v{VERSION}"
 
 커밋할 변경이 없으면 `git commit`은 건너뛰고 tag만 수행.
 
-#### 3-1-6. 실패 처리
+#### 3-1-5. 실패 처리
 
 commit/tag 명령이 실패하면 현재 항목을 실패 리스트에 기록하고, 사용자에게 계속할지 묻습니다:
 
