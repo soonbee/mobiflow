@@ -103,19 +103,22 @@
 
     .mockup { display: flex; flex-direction: column; align-items: center; gap: 12px; }
     .mockup figcaption {
-      display: inline-flex; align-items: center; gap: 6px;
+      display: inline-flex; align-items: center;
       font-size: 11px; font-weight: 600; color: var(--muted);
       letter-spacing: 1.5px; text-transform: uppercase;
     }
     .mockup figcaption a {
-      color: var(--muted); text-decoration: none;
-      font-size: 13px; letter-spacing: 0; line-height: 1;
-      padding: 2px 4px; border-radius: 4px;
+      display: inline-flex; align-items: center; gap: 6px;
+      color: inherit; text-decoration: none;
+      padding: 8px 12px; min-height: 32px; border-radius: 6px;
       transition: color 120ms, background 120ms;
     }
     .mockup figcaption a:hover {
       color: var(--accent);
       background: rgba(10, 102, 194, 0.08);
+    }
+    .mockup figcaption .open-arrow {
+      font-size: 13px; letter-spacing: 0; line-height: 1;
     }
 
     .device-chassis {
@@ -161,12 +164,19 @@
         const iframe = mockup.querySelector('iframe');
         const caption = mockup.querySelector('figcaption');
         if (!iframe || !caption) return;
+        const label = caption.textContent.trim();
         const a = document.createElement('a');
         a.href = iframe.getAttribute('src');
         a.target = '_blank';
         a.rel = 'noopener';
-        a.textContent = '↗';
-        a.setAttribute('aria-label', 'Open ' + caption.textContent.trim() + ' in new tab');
+        a.setAttribute('aria-label', 'Open ' + label + ' in new tab');
+        a.appendChild(document.createTextNode(label));
+        const arrow = document.createElement('span');
+        arrow.className = 'open-arrow';
+        arrow.setAttribute('aria-hidden', 'true');
+        arrow.textContent = '↗';
+        a.appendChild(arrow);
+        caption.textContent = '';
         caption.appendChild(a);
       });
     })();
