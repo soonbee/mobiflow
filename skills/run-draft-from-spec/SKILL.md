@@ -350,7 +350,35 @@ INDEX.md(사람 검토용 마크다운)와 INDEX.html(브라우저 갤러리 진
 
 `viewports:`는 STEP 1에서 이미 기록되어 있어야 한다. 본 단계에서는 `version`·`updated`만 갱신하며 `viewports`는 변경 금지 (변경하면 기존 캡처와 일관성 깨짐). 이 frontmatter가 통합 Lock 태그(`draft/v0.1.0`)의 버전 기준.
 
-### 5-4. 완료 요약 출력
+### 5-4. 루트 Makefile `preview` target 관리
+
+사용자가 `make preview` 한 번으로 INDEX 갤러리를 띄울 수 있게 프로젝트 루트 `Makefile`에 target을 보장한다. cd/prefix 마찰 제거가 목적.
+
+**템플릿 스니펫**: `skills/run-draft-from-spec/templates/Makefile`
+
+```makefile
+preview:
+	npm --prefix docs/ui-drafts/_shared/_tools run preview
+
+.PHONY: preview
+```
+
+(들여쓰기는 Tab 필수 — Makefile 문법)
+
+**정책** (사용자 소유 루트 Makefile 파괴 방지):
+
+1. **루트 `Makefile` 없음** → 템플릿을 그대로 복사
+2. **루트 `Makefile` 있고 `^preview:` 라인 없음** → 템플릿 내용을 파일 끝에 append (앞에 빈 줄 1개 보장). 완료 보고에 "루트 Makefile에 `preview` target 추가됨" 1줄 언급
+3. **루트 `Makefile` 있고 `^preview:` 이미 존재** → 건드리지 않음. 기존 target이 동작한다고 간주하고 완료 보고는 그대로 `make preview` 안내
+
+**체크**:
+```bash
+test -f Makefile && grep -q '^preview:' Makefile && echo "exists" || echo "absent-or-no-target"
+```
+
+`update` 모드에서도 동일 정책 (누락 시 보충, 존재 시 보존).
+
+### 5-5. 완료 요약 출력
 
 ```
 ✅ UI Drafts v0.1.0 작성 완료
@@ -367,7 +395,7 @@ INDEX.md(사람 검토용 마크다운)와 INDEX.html(브라우저 갤러리 진
   강한 판정: 0건 | 권장: N건 | 평론 노트: N건
 
 검토 방법:
-  cd docs/ui-drafts/_shared/_tools && npm run preview
+  make preview
   (또는 cd docs/ui-drafts && python3 -m http.server 8765
    → http://localhost:8765/_shared/INDEX.html)
 
@@ -376,7 +404,7 @@ INDEX.md(사람 검토용 마크다운)와 INDEX.html(브라우저 갤러리 진
 
 권장·평론 노트가 있으면 요약 아래에 그대로 인용. 캡처 실패가 있으면 실패 표(화면·variant·viewport·원인)도 함께 출력.
 
-### 5-5. Lifecycle 프롬프트
+### 5-6. Lifecycle 프롬프트
 
 기본:
 > draft phase가 완료되었습니다.
