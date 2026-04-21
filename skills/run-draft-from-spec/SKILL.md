@@ -528,6 +528,7 @@ node docs/ui-drafts/_shared/_tools/capture.mjs \
 - INDEX는 **라이브 iframe 갤러리**다. 각 SCR의 default + 모든 variant를 device chassis로 감싸 한 페이지에 나열해 side-by-side 비교를 지원한다. 클릭해서 새 탭으로 이동해야 하는 동선은 제거한다(open 링크는 보조 수단으로만 유지)
 - PNG 캡처(STEP 4)는 INDEX의 primary view에서 빠지고 **후속 implement phase의 design-diff 증적**이 주 목적이다. INDEX에서는 viewport별 PNG 직링크를 보조 nav로만 제공
 - chassis는 **단일 iPhone 스타일로 고정**. 기기 모델/Android 등 세분화는 후속 버전 과제
+- 섹션 nav(`.section-rail`)는 `.page-head` 외부 독립 컴포넌트. ≥1024px에서 우측 fixed rail로, 그 외에는 상단 inline wrap으로 전환된다. 링크는 DOM(`main .scr[id]`)에서 스크립트가 런타임 생성하므로 템플릿에 SCR별 링크를 선기록하지 않는다(SCR 추가 시 nav 수동 동기화 불필요). 스크롤 시 현재 섹션이 `is-active`로 하이라이트됨(IntersectionObserver)
 
 **입력 파싱**:
 - `ui-design.md` §1 → 화면 ID 목록 + 제목 (`{SCR}`, `{TITLE}` 자리)
@@ -583,7 +584,7 @@ node docs/ui-drafts/_shared/_tools/capture.mjs \
     }
     .page-head {
       max-width: 1360px;
-      margin: 0 auto 32px;
+      margin: 0 auto 24px;
       display: flex;
       flex-wrap: wrap;
       align-items: baseline;
@@ -591,13 +592,50 @@ node docs/ui-drafts/_shared/_tools/capture.mjs \
     }
     .page-head h1 { margin: 0; font-size: 24px; letter-spacing: -0.5px; }
     .page-head .meta { font-size: 13px; color: var(--muted); }
-    .page-head nav { margin-left: auto; display: flex; flex-wrap: wrap; gap: 6px; }
-    .page-head nav a {
+
+    .section-rail {
+      max-width: 1360px;
+      margin: 0 auto 32px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .section-rail a {
       font-size: 12px; color: var(--muted); text-decoration: none;
       padding: 4px 10px; border: 1px solid var(--border); border-radius: 999px;
       background: var(--surface);
     }
-    .page-head nav a:hover { color: var(--accent); border-color: var(--accent); }
+    .section-rail a:hover { color: var(--accent); border-color: var(--accent); }
+    .section-rail a.is-active {
+      color: var(--surface); background: var(--accent); border-color: var(--accent);
+    }
+
+    @media (min-width: 1024px) {
+      body { padding-right: 128px; }
+      .section-rail {
+        position: fixed;
+        top: 24px;
+        right: 16px;
+        bottom: 24px;
+        width: 96px;
+        max-width: none;
+        margin: 0;
+        padding: 10px 8px;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        gap: 4px;
+        overflow-y: auto;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px -4px rgba(0,0,0,0.08);
+        background: var(--surface);
+        z-index: 10;
+      }
+      .section-rail a {
+        text-align: center;
+        border-color: transparent;
+        border-radius: 6px;
+      }
+    }
 
     .scr {
       max-width: 1360px;
@@ -669,11 +707,54 @@ node docs/ui-drafts/_shared/_tools/capture.mjs \
   <header class="page-head">
     <h1>UI Drafts {VERSION}</h1>
     <span class="meta">viewports: {VP_LIST} · primary: {PRIMARY_VP_NAME}</span>
-    <nav>{JUMP_LINKS}</nav>
   </header>
+  <nav class="section-rail" aria-label="sections"></nav>
   <main>
     {SCR_SECTIONS}
   </main>
+  <script>
+    (function () {
+      const rail = document.querySelector('.section-rail');
+      const sections = Array.from(document.querySelectorAll('main .scr[id]'));
+      if (!rail || sections.length === 0) return;
+
+      const linkById = new Map();
+      const order = new Map();
+      sections.forEach((sec, i) => {
+        order.set(sec, i);
+        const a = document.createElement('a');
+        a.href = '#' + sec.id;
+        a.textContent = sec.id;
+        rail.appendChild(a);
+        linkById.set(sec.id, a);
+      });
+
+      function ensureRailVisible(link) {
+        if (rail.offsetParent === null) return;
+        if (rail.scrollHeight <= rail.clientHeight) return;
+        const r = link.getBoundingClientRect();
+        const p = rail.getBoundingClientRect();
+        if (r.top < p.top) rail.scrollTop += r.top - p.top - 8;
+        else if (r.bottom > p.bottom) rail.scrollTop += r.bottom - p.bottom + 8;
+      }
+
+      const visible = new Set();
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) visible.add(e.target);
+          else visible.delete(e.target);
+        });
+        const topmost = [...visible].sort((a, b) => order.get(a) - order.get(b))[0];
+        linkById.forEach((a) => a.classList.remove('is-active'));
+        if (topmost) {
+          const active = linkById.get(topmost.id);
+          active.classList.add('is-active');
+          ensureRailVisible(active);
+        }
+      }, { rootMargin: '-20% 0px -60% 0px', threshold: 0 });
+      sections.forEach((sec) => observer.observe(sec));
+    })();
+  </script>
 </body>
 </html>
 ```
@@ -720,7 +801,6 @@ chassis 미적용 (그 외 viewport):
 ```
 
 **치환 규칙**:
-- `{JUMP_LINKS}`: SCR마다 `<a href="#{SCR}">{SCR}</a>` 반복 (페이지 헤더 우측 점프 네비)
 - `{REL}` / `{LABEL}`: default는 `index.html` / `default`, variant는 `variants/{stem}.html` / `{stem}`
 - `{PNG_LINKS}`: 존재하는 PNG만 링크로 — viewport마다 `<a href="/{SCR}/screenshots/default{.vp}.png">png:{vp}</a>`, `default.full*.png`가 있으면 `<a href="/{SCR}/screenshots/default.full{.vp}.png">full:{vp}</a>`. 단일 뷰포트면 `{.vp}` 부분과 `:{vp}` 레이블 접미 생략
 - `{SCROLL_BADGE}`: 해당 SCR에 `default.full*.png`가 하나라도 있으면 `<span class="badge">scroll</span>`, `full=truncated`면 `<span class="badge">scroll · truncated</span>`. 없으면 빈 문자열
