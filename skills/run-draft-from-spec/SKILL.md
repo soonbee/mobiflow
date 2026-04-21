@@ -326,15 +326,16 @@ INDEX.md(사람 검토용 마크다운)와 INDEX.html(브라우저 갤러리 진
 - `ui-design.md` §1 → 화면 ID + 제목 (`{SCR}`, `{TITLE}`)
 - `_shared/aesthetic.md` frontmatter `viewports:` → 첫 번째 viewport가 iframe 렌더 기준(`{PRIMARY_VP}`). `mobile`이면 chassis 적용, 그 외는 `device-frame-plain`
 - 각 `SCR-xxx/variants/*.html` 스캔 → iframe 목업 추가
+- **각 `SCR-xxx/style.css`의 `[data-state="<name>"]` 셀렉터 스캔** → default 외 상태마다 `?state=<name>` iframe 목업 추가. 이를 통해 INDEX.html 갤러리에서 모든 상태를 나란히 비교 가능
 
 **iframe 규칙**:
-- src: `/{SCR}/index.html` 또는 `/{SCR}/variants/{stem}.html` (절대 경로, 서버 루트 = `docs/ui-drafts/`)
+- src: `/{SCR}/index.html`, `/{SCR}/index.html?state=<name>`, 또는 `/{SCR}/variants/{stem}.html` (절대 경로, 서버 루트 = `docs/ui-drafts/`)
 - width/height: `{PRIMARY_VP.width}` × `{PRIMARY_VP.height}` (고정 픽셀)
 - `loading="lazy"` 필수
 - `title` 속성: `{SCR} {LABEL}`
 
 **치환 규칙**:
-- `{REL}` / `{LABEL}`: default는 `index.html` / `default`, variant는 `variants/{stem}.html` / `{stem}`
+- `{REL}` / `{LABEL}`: default는 `index.html` / `default`, 상태는 `index.html?state=<name>` / `<name>`, variant는 `variants/{stem}.html` / `{stem}`
 - `{SCROLL_BADGE}`: 해당 SCR에 `default.full*.png`가 하나라도 있으면 `<span class="badge">scroll</span>`, `full=truncated`면 `<span class="badge">scroll · truncated</span>`. 없으면 빈 문자열
 - `{VP_LIST}` / `{PRIMARY_VP_NAME}`: `{VIEWPORTS}` 전개값
 - variant별 ↗ 오픈 링크는 스크립트가 런타임 주입하므로 템플릿에 선기록 금지

@@ -52,7 +52,7 @@ Do not touch other screens or `_shared/`.
 
 - **Structural commonality (header, tabbar, footer, modal container) is enforced via partials. Pattern commonality (buttons, cards, inputs, badges) is NOT enforced — compose each screen freely within tokens and aesthetic.md.** Do not invent `components.css` or component class libraries. Each screen's buttons and cards may look distinct as long as `tokens.css` and `aesthetic.md` are honored.
 - Follow `aesthetic.md` "금지 목록" strictly. If aesthetic.md prohibits gradients, do not use gradients anywhere
-- Implement every UI element and state listed in ui-design.md §3 for the screen. Use the `data-state` toggle pattern from `dev-ui-draft` for state demonstrations
+- Implement every UI element and state listed in ui-design.md §3 for the screen. Use the `?state=` URL query param pattern from `dev-ui-draft` for state demonstrations (no dev-only toggle buttons in the HTML)
 - When ui-design.md is ambiguous, make a reasonable choice and record the assumption in the screen's `notes.md` 「가정」 section
 - Do not add UI elements, screens, or variants not present in ui-design.md §3
 - No build tools, no npm install, no React/Vue/Svelte. Plain static files only
