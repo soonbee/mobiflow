@@ -575,7 +575,7 @@ node docs/ui-drafts/_shared/_tools/capture.mjs \
     * { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; }
     body {
-      padding: 48px 40px 80px;
+      padding: 32px 16px 64px;
       background: var(--bg);
       color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Pretendard", "Apple SD Gothic Neo", sans-serif;
@@ -583,8 +583,7 @@ node docs/ui-drafts/_shared/_tools/capture.mjs \
       min-height: 100vh;
     }
     .page-head {
-      max-width: 1360px;
-      margin: 0 auto 24px;
+      margin: 0 0 24px;
       display: flex;
       flex-wrap: wrap;
       align-items: baseline;
@@ -594,8 +593,7 @@ node docs/ui-drafts/_shared/_tools/capture.mjs \
     .page-head .meta { font-size: 13px; color: var(--muted); }
 
     .section-rail {
-      max-width: 1360px;
-      margin: 0 auto 32px;
+      margin: 0 0 32px;
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
@@ -618,7 +616,6 @@ node docs/ui-drafts/_shared/_tools/capture.mjs \
         right: 16px;
         bottom: 24px;
         width: 96px;
-        max-width: none;
         margin: 0;
         padding: 10px 8px;
         flex-direction: column;
@@ -638,8 +635,7 @@ node docs/ui-drafts/_shared/_tools/capture.mjs \
     }
 
     .scr {
-      max-width: 1360px;
-      margin: 0 auto 56px;
+      margin: 0 0 56px;
       scroll-margin-top: 24px;
     }
     .scr__head {
