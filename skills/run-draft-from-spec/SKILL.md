@@ -312,6 +312,8 @@ INDEX.md(사람 검토용 마크다운)와 INDEX.html(브라우저 갤러리 진
 
 `docs/ui-drafts/_shared/INDEX.html`을 매번 재생성(덮어쓰기). "정전 코드" 원칙 — 템플릿의 placeholder만 치환한다.
 
+**동기화 불변식**: `SCR-xxx/` 트리가 변경되면(수동 편집 포함, STEP 2 파이프라인 외에서 발생한 경우도) INDEX.html은 변경 직후 재생성되어야 한다. 오케스트레이터는 본 STEP 5-1-b를 단독으로 호출하여 동기화를 맞춘다. STEP 1→4 선행은 전제 조건이 아니다.
+
 **템플릿**:
 - 셸 + 스크립트: `skills/run-draft-from-spec/templates/INDEX.html`
 - SCR 섹션 + mockup 조각: `skills/run-draft-from-spec/templates/INDEX-section.html`
