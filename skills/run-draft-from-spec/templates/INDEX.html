@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <title>UI Drafts {VERSION} Preview</title>
+  <style>
+    :root {
+      --bg: #efeae1;
+      --surface: #fff;
+      --border: #e5e0d6;
+      --text: #1a1817;
+      --muted: #6d655b;
+      --accent: #0a66c2;
+      --chassis-bezel: #0c0c0e;
+      --chassis-radius: 58px;
+      --chassis-inner-radius: 44px;
+      --chassis-padding: 14px;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      padding: 32px 16px 64px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Pretendard", "Apple SD Gothic Neo", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+    .page-head {
+      margin: 0 0 24px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 16px 24px;
+    }
+    .page-head h1 { margin: 0; font-size: 24px; letter-spacing: -0.5px; }
+    .page-head .meta { font-size: 13px; color: var(--muted); }
+
+    .section-rail {
+      margin: 0 0 32px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .section-rail a {
+      font-size: 12px; color: var(--muted); text-decoration: none;
+      padding: 4px 10px; border: 1px solid var(--border); border-radius: 999px;
+      background: var(--surface);
+    }
+    .section-rail a:hover { color: var(--accent); border-color: var(--accent); }
+    .section-rail a.is-active {
+      color: var(--surface); background: var(--accent); border-color: var(--accent);
+    }
+
+    @media (min-width: 1024px) {
+      body { padding-right: 128px; }
+      .section-rail {
+        position: fixed;
+        top: 24px;
+        right: 16px;
+        bottom: 24px;
+        width: 96px;
+        margin: 0;
+        padding: 10px 8px;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        gap: 4px;
+        overflow-y: auto;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px -4px rgba(0,0,0,0.08);
+        background: var(--surface);
+        z-index: 10;
+      }
+      .section-rail a {
+        text-align: center;
+        border-color: transparent;
+        border-radius: 6px;
+      }
+    }
+
+    .scr {
+      margin: 0 0 56px;
+      scroll-margin-top: 24px;
+    }
+    .scr__head {
+      display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px 16px;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .scr__head h2 { margin: 0; font-size: 16px; font-weight: 700; letter-spacing: -0.2px; }
+    .scr__head .id { color: var(--muted); font-weight: 600; margin-right: 8px; }
+    .scr__head .badge {
+      display: inline-block; padding: 2px 8px; font-size: 11px; font-weight: 500;
+      color: var(--muted); border: 1px solid var(--border); border-radius: 999px;
+      letter-spacing: 0.02em; white-space: nowrap;
+      background: var(--surface);
+    }
+    .scr__row {
+      display: flex; flex-wrap: wrap; gap: 40px;
+      align-items: flex-start;
+    }
+
+    .mockup { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+    .mockup figcaption {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 11px; font-weight: 600; color: var(--muted);
+      letter-spacing: 1.5px; text-transform: uppercase;
+    }
+    .mockup figcaption a {
+      color: var(--muted); text-decoration: none;
+      font-size: 13px; letter-spacing: 0; line-height: 1;
+      padding: 2px 4px; border-radius: 4px;
+      transition: color 120ms, background 120ms;
+    }
+    .mockup figcaption a:hover {
+      color: var(--accent);
+      background: rgba(10, 102, 194, 0.08);
+    }
+
+    .device-chassis {
+      padding: var(--chassis-padding);
+      background: linear-gradient(145deg, #2a2a2e, #0b0b0e);
+      border-radius: var(--chassis-radius);
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.06) inset,
+        0 30px 60px -20px rgba(0,0,0,0.35),
+        0 12px 24px -12px rgba(0,0,0,0.22);
+    }
+    .device-chassis iframe {
+      display: block; border: 0; background: #fff;
+      border-radius: var(--chassis-inner-radius);
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.04) inset;
+    }
+
+    .device-frame-plain {
+      padding: 4px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      box-shadow: 0 4px 12px -4px rgba(0,0,0,0.08);
+    }
+    .device-frame-plain iframe {
+      display: block; border: 0; background: #fff;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <header class="page-head">
+    <h1>UI Drafts {VERSION}</h1>
+    <span class="meta">viewports: {VP_LIST} · primary: {PRIMARY_VP_NAME}</span>
+  </header>
+  <nav class="section-rail" aria-label="sections"></nav>
+  <main>
+    {SCR_SECTIONS}
+  </main>
+  <script>
+    (function () {
+      document.querySelectorAll('.mockup').forEach((mockup) => {
+        const iframe = mockup.querySelector('iframe');
+        const caption = mockup.querySelector('figcaption');
+        if (!iframe || !caption) return;
+        const a = document.createElement('a');
+        a.href = iframe.getAttribute('src');
+        a.target = '_blank';
+        a.rel = 'noopener';
+        a.textContent = '↗';
+        a.setAttribute('aria-label', 'Open ' + caption.textContent.trim() + ' in new tab');
+        caption.appendChild(a);
+      });
+    })();
+
+    (function () {
+      const rail = document.querySelector('.section-rail');
+      const sections = Array.from(document.querySelectorAll('main .scr[id]'));
+      if (!rail || sections.length === 0) return;
+
+      const linkById = new Map();
+      const order = new Map();
+      sections.forEach((sec, i) => {
+        order.set(sec, i);
+        const a = document.createElement('a');
+        a.href = '#' + sec.id;
+        a.textContent = sec.id;
+        rail.appendChild(a);
+        linkById.set(sec.id, a);
+      });
+
+      function ensureRailVisible(link) {
+        if (rail.offsetParent === null) return;
+        if (rail.scrollHeight <= rail.clientHeight) return;
+        const r = link.getBoundingClientRect();
+        const p = rail.getBoundingClientRect();
+        if (r.top < p.top) rail.scrollTop += r.top - p.top - 8;
+        else if (r.bottom > p.bottom) rail.scrollTop += r.bottom - p.bottom + 8;
+      }
+
+      const visible = new Set();
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) visible.add(e.target);
+          else visible.delete(e.target);
+        });
+        const topmost = [...visible].sort((a, b) => order.get(a) - order.get(b))[0];
+        linkById.forEach((a) => a.classList.remove('is-active'));
+        if (topmost) {
+          const active = linkById.get(topmost.id);
+          active.classList.add('is-active');
+          ensureRailVisible(active);
+        }
+      }, { rootMargin: '-20% 0px -60% 0px', threshold: 0 });
+      sections.forEach((sec) => observer.observe(sec));
+    })();
+  </script>
+</body>
+</html>
