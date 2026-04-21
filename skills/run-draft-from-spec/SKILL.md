@@ -525,8 +525,8 @@ node docs/ui-drafts/_shared/_tools/capture.mjs \
 `docs/ui-drafts/_shared/INDEX.html`을 매 STEP 5마다 재생성(덮어쓰기)한다. `includer.js`·`capture.mjs`와 동일한 "정전 코드" 원칙 — 아래 템플릿의 placeholder만 동적으로 치환.
 
 **역할 재정의 (v0.2~)**:
-- INDEX는 **라이브 iframe 갤러리**다. 각 SCR의 default + 모든 variant를 device chassis로 감싸 한 페이지에 나열해 side-by-side 비교를 지원한다. 클릭해서 새 탭으로 이동해야 하는 동선은 제거한다(open 링크는 보조 수단으로만 유지)
-- PNG 캡처(STEP 4)는 INDEX의 primary view에서 빠지고 **후속 implement phase의 design-diff 증적**이 주 목적이다. INDEX에서는 viewport별 PNG 직링크를 보조 nav로만 제공
+- INDEX는 **라이브 iframe 갤러리**다. 각 SCR의 default + 모든 variant를 device chassis로 감싸 한 페이지에 나열해 side-by-side 비교를 지원한다. SCR 헤더에는 진입점 링크를 두지 않음 — 각 variant의 figcaption에 ↗ 오픈 링크가 런타임 주입되어, devtools/리사이즈/요소 검사 등이 필요한 사용자가 해당 variant를 새 탭에서 직접 연다
+- PNG 캡처(STEP 4)는 INDEX의 primary view에서 빠지고 **후속 implement phase의 design-diff 증적**이 주 목적이다. INDEX는 PNG 링크를 노출하지 않는다(iframe 갤러리가 프리뷰 역할을 완전 대체 — 파일 공유가 필요하면 `/SCR-xxx/screenshots/` 경로로 직접 접근)
 - chassis는 **단일 iPhone 스타일로 고정**. 기기 모델/Android 등 세분화는 후속 버전 과제
 - 섹션 nav(`.section-rail`)는 `.page-head` 외부 독립 컴포넌트. ≥1024px에서 우측 fixed rail로, 그 외에는 상단 inline wrap으로 전환된다. 링크는 DOM(`main .scr[id]`)에서 스크립트가 런타임 생성하므로 템플릿에 SCR별 링크를 선기록하지 않는다(SCR 추가 시 nav 수동 동기화 불필요). 스크롤 시 현재 섹션이 `is-active`로 하이라이트됨(IntersectionObserver)
 
@@ -656,14 +656,6 @@ node docs/ui-drafts/_shared/_tools/capture.mjs \
       letter-spacing: 0.02em; white-space: nowrap;
       background: var(--surface);
     }
-    .scr__head .links { margin-left: auto; display: flex; flex-wrap: wrap; gap: 6px; }
-    .scr__head .links a {
-      font-size: 12px; color: var(--muted); text-decoration: none;
-      padding: 4px 10px; border: 1px solid var(--border); border-radius: 6px;
-      background: var(--surface);
-    }
-    .scr__head .links a:hover { color: var(--accent); border-color: var(--accent); }
-
     .scr__row {
       display: flex; flex-wrap: wrap; gap: 40px;
       align-items: flex-start;
@@ -671,8 +663,19 @@ node docs/ui-drafts/_shared/_tools/capture.mjs \
 
     .mockup { display: flex; flex-direction: column; align-items: center; gap: 12px; }
     .mockup figcaption {
+      display: inline-flex; align-items: center; gap: 6px;
       font-size: 11px; font-weight: 600; color: var(--muted);
       letter-spacing: 1.5px; text-transform: uppercase;
+    }
+    .mockup figcaption a {
+      color: var(--muted); text-decoration: none;
+      font-size: 13px; letter-spacing: 0; line-height: 1;
+      padding: 2px 4px; border-radius: 4px;
+      transition: color 120ms, background 120ms;
+    }
+    .mockup figcaption a:hover {
+      color: var(--accent);
+      background: rgba(10, 102, 194, 0.08);
     }
 
     .device-chassis {
@@ -713,6 +716,21 @@ node docs/ui-drafts/_shared/_tools/capture.mjs \
     {SCR_SECTIONS}
   </main>
   <script>
+    (function () {
+      document.querySelectorAll('.mockup').forEach((mockup) => {
+        const iframe = mockup.querySelector('iframe');
+        const caption = mockup.querySelector('figcaption');
+        if (!iframe || !caption) return;
+        const a = document.createElement('a');
+        a.href = iframe.getAttribute('src');
+        a.target = '_blank';
+        a.rel = 'noopener';
+        a.textContent = '↗';
+        a.setAttribute('aria-label', 'Open ' + caption.textContent.trim() + ' in new tab');
+        caption.appendChild(a);
+      });
+    })();
+
     (function () {
       const rail = document.querySelector('.section-rail');
       const sections = Array.from(document.querySelectorAll('main .scr[id]'));
@@ -765,10 +783,6 @@ node docs/ui-drafts/_shared/_tools/capture.mjs \
 <section id="{SCR}" class="scr">
   <header class="scr__head">
     <h2><span class="id">{SCR}</span>{TITLE}{SCROLL_BADGE}</h2>
-    <div class="links">
-      <a href="/{SCR}/index.html" target="_blank" rel="noopener">open ↗</a>
-      {PNG_LINKS}
-    </div>
   </header>
   <div class="scr__row">
     {MOCKUPS}
@@ -802,9 +816,8 @@ chassis 미적용 (그 외 viewport):
 
 **치환 규칙**:
 - `{REL}` / `{LABEL}`: default는 `index.html` / `default`, variant는 `variants/{stem}.html` / `{stem}`
-- `{PNG_LINKS}`: 존재하는 PNG만 링크로 — viewport마다 `<a href="/{SCR}/screenshots/default{.vp}.png">png:{vp}</a>`, `default.full*.png`가 있으면 `<a href="/{SCR}/screenshots/default.full{.vp}.png">full:{vp}</a>`. 단일 뷰포트면 `{.vp}` 부분과 `:{vp}` 레이블 접미 생략
 - `{SCROLL_BADGE}`: 해당 SCR에 `default.full*.png`가 하나라도 있으면 `<span class="badge">scroll</span>`, `full=truncated`면 `<span class="badge">scroll · truncated</span>`. 없으면 빈 문자열
-- 캡처 실패한 (SCR, viewport)는 해당 PNG 링크를 생성하지 않음(⚠️ 마커는 INDEX.md 표에만 유지 — INDEX.html은 iframe이 primary이므로 PNG 부재가 결함으로 보이지 않도록)
+- variant별 ↗ 오픈 링크는 스크립트가 `.mockup > iframe[src]` + `figcaption`에서 런타임 주입한다. 템플릿에 링크를 선기록하지 않음 — SCR/variant 추가 시 iframe + figcaption만 emit하면 자동 반영
 
 **갤러리 성능 주의**:
 - 모든 iframe에 `loading="lazy"` 필수. 화면 20개 × 평균 1.5 variant = 30 iframe이어도 초기 페인트 부담 없음
