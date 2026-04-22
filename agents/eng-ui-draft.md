@@ -2,7 +2,7 @@
 name: eng-ui-draft
 description: UI 시안(draft) 엔지니어. spec 문서를 해석하여 정적 HTML/CSS/JS로 디자인 시안을 작성한다. UI 시안 제작, 화면 목업, _shared 공통 자산 빌드 시 사용한다.
 tools: Read, Write, Edit, Bash, Grep, Glob
-model: inherit
+model: opus
 skills:
   - frontend-design
   - with-ui-spec
