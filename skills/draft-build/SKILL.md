@@ -463,7 +463,7 @@ test -f Makefile && grep -q '^preview:' Makefile && echo "exists" || echo "absen
 
 > draft phase가 완료되었습니다.
 >
-> 1. Lock (`git commit` + `git tag draft/v{VERSION}`)
+> 1. Lock (`/nidost:draft-lock` — `docs/ui-drafts/`를 commit + `draft/v{VERSION}` 태그)
 > 2. Working 상태 유지 (추가 화면 작성 또는 수동 편집 예정)
 > 3. 시안 수정 (`/nidost:draft-revise`)
 > 4. dev phase 진입 (`/nidost:compile-project-config` → `dev-segment-router`)
@@ -472,7 +472,7 @@ test -f Makefile && grep -q '^preview:' Makefile && echo "exists" || echo "absen
 
 > 5. 캡처만 재시도 (build/review는 건드리지 않고 STEP 4만 다시 실행)
 
-- 선택 1: commit + tag 안내. 직접 수행하지 않고 사용자에게 위임 (spec-lock 패턴과 동일)
+- 선택 1: `draft-lock` 슬래시 커맨드 안내. 본 스킬은 자동 호출하지 않고 사용자에게 위임 (spec-lock 패턴과 동일)
 - 선택 5: STEP 4만 재실행
 
 ---
