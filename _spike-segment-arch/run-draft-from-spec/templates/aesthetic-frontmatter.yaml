@@ -1,0 +1,12 @@
+---
+title: UI Drafts Aesthetic
+version: 0.1.0
+based_on:
+  - ui-design@{UI_DESIGN_VERSION}
+  - design-tokens@{DT_VERSION}
+viewports:
+  - { name: mobile,  width: 390,  height: 844 }
+  - { name: desktop, width: 1440, height: 900 }
+created: {YYYY-MM-DD}
+updated: {YYYY-MM-DD}
+---
