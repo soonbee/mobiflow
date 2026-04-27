@@ -80,9 +80,8 @@ Collect three identity values. Auto-detect each from existing project artifacts,
    1. Root `package.json` `name` field, if present and matches the regex.
    2. `basename "$PWD"` normalized to kebab-case (lowercase; spaces/underscores → `-`; strip non `[a-z0-9-]`; collapse repeats; trim leading/trailing `-`).
 2. **`displayName`** — human-readable. Used as `app.json.name`. Detection order:
-   1. First `# ` heading text in `docs/prd/prd.md` (strip surrounding whitespace).
-   2. First `# ` heading text in `README.md`.
-   3. `projectName` title-cased (`my-cool-app` → `My Cool App`) as final fallback.
+   1. First `# ` heading text in `README.md` (strip surrounding whitespace).
+   2. `projectName` title-cased (`my-cool-app` → `My Cool App`) as final fallback.
 3. **`bundleId`** — reverse-domain. Regex: `^[a-z][a-z0-9]*(\.[a-z][a-z0-9]*)+$`. Used for both `ios.bundleIdentifier` and `android.package`. Detection order:
    1. Grep `docs/spec/architecture.md` for an existing `bundleIdentifier` / `package` value matching the regex; use it if found.
    2. Default: `com.example.<projectName-with-hyphens-removed>` (e.g. `my-cool-app` → `com.example.mycoolapp`).
@@ -351,7 +350,7 @@ Real device/simulator builds (first time only):
 ## Notes for future maintenance of this skill
 
 - **Layout source.** The target path comes from `docs/project.config.yaml` `repo.scopes.<scope>.path` (matched by `runtime: react-native-expo` + `framework: expo`). The skill aborts if config is missing or no scope matches. To support multi-app projects (e.g., `apps/customer-mobile` + `apps/admin-mobile`), the matching algorithm in `Required config` would need a `--scope <name>` argument override.
-- **Auto-detection sources.** The order is package.json → README → basename for `projectName`, PRD → README → titlecase for `displayName`, architecture-grep → `com.example.<name>` for `bundleId`. If a project later writes identity into a different artifact (e.g., a dedicated `docs/spec/identity.md` or a `project.bundle_id` field in `project.config.yaml`), add it to the detection chain and prefer it before the existing fallbacks.
+- **Auto-detection sources.** The order is package.json → README → basename for `projectName`, README → titlecase for `displayName`, architecture-grep → `com.example.<name>` for `bundleId`. PRD was intentionally dropped from `displayName` sources — PRD H1 tends to be a *document title* (`# <Project> PRD`, `# <Project> 기획서`) rather than the product display name, and contaminated detections often slipped past the confirmation step. If a project later writes identity into a different artifact (e.g., a dedicated `docs/spec/identity.md` or a `project.bundle_id` field in `project.config.yaml`), add it to the detection chain and prefer it before the existing fallbacks.
 - **Overlay files are mirrors of this repo's current state.** When the source repo's `babel.config.js`, `eslint.config.js`, theme, etc. change, the overlay must be re-copied. There is no automated sync.
 - **SDK pin.** `--template default@sdk-55` is intentional and matched against `framework_version` in config. When upgrading to SDK 56+, create a sibling skill (`expo-sdk56-unistyles-stack`) rather than mutating this one — the skill name encodes the version contract. Common logic (scope matching, identity detection) can be extracted into a shared skill at that point.
 - **Reproduction docs are skill-internal.** `docs/01-cleanup.md` through `docs/06-smoke.md` live with the skill, not in the scaffolded project. Their audience is whoever maintains this skill (regenerating the overlay on SDK upgrades, debugging why a particular dep was dropped, etc.). They reference `mobile` as the example project name throughout — that's the recorded reproduction artifact, not a layout commitment. The skill itself reads `<MOBILE_PATH>` from config.
