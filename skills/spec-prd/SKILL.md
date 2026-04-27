@@ -16,6 +16,27 @@ disable-model-invocation: true
 
 아래 항목을 순서대로 검증합니다. 하나라도 실패하면 중단하고 사용자에게 원인을 설명합니다.
 
+### 0-pre. 작업 브랜치 확인
+
+`docs/doc-guide.md`의 「작업 라인」을 따릅니다. 현재 브랜치가 `main`이면 `develop`으로 자동 이동합니다. 이외 브랜치는 그대로 진행합니다.
+
+```bash
+CURRENT_BRANCH=$(git symbolic-ref --short HEAD 2>/dev/null)
+if [ "$CURRENT_BRANCH" = "main" ]; then
+  if ! git show-ref --verify --quiet refs/heads/develop; then
+    echo "❌ develop 브랜치가 없습니다. /nidost:init으로 먼저 부트스트랩해주세요."
+    exit 1
+  fi
+  if [ -n "$(git status --porcelain)" ]; then
+    echo "❌ main 브랜치에 미커밋 변경이 있어 develop으로 이동할 수 없습니다."
+    echo "   변경을 commit·stash·discard 중 하나로 처리한 뒤 다시 호출해주세요."
+    exit 1
+  fi
+  git checkout develop
+  echo "ℹ️ docs 작업을 위해 develop 브랜치로 이동했습니다."
+fi
+```
+
 ### 0-1. doc-guide.md 존재 확인
 
 ```bash

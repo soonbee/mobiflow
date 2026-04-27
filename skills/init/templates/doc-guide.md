@@ -481,6 +481,21 @@ grep -n '^## ' docs/<카테고리>/<카테고리>.md
 
 ## Git 컨벤션
 
+### 작업 라인
+
+spec phase의 commit·tag는 **`develop` 브랜치에서 수행**한다. `main`에 직접 docs commit·tag를 만들지 않는다 (git-flow의 "main 직접 커밋 금지" 정책).
+
+각 spec-* 스킬과 `spec-lock`은 STEP 0 첫머리(`0-pre`)에서 현재 브랜치를 검사한다:
+
+- 현재 브랜치가 `main` → `develop`으로 자동 checkout. `main`에 미커밋 변경이 있으면 중단한다 (자동 stash 안 함).
+- `develop`, `feature/*`, `release/*`, `hotfix/*`, 그 외 임의 브랜치 → 그대로 진행. 사용자가 의도적으로 다른 라인에서 docs PATCH를 수행하는 시나리오(예: dev 중 PRD 오타 수정을 `feature/<id>`에서, 긴급 spec 보정을 `hotfix/<id>`에서)를 침해하지 않는다.
+
+doc tag는 `main`에서 직접 만들어지지 않으므로 항상 머지 경로를 통해 `main`에 도달한다:
+
+- spec baseline → `develop`에서 commit + tag → 첫 `release/x.y.z` 머지로 `main` 도달
+- dev 중 spec PATCH → `feature/<id>` → `develop` → release 머지
+- hotfix 중 spec PATCH → `hotfix/<id>` → main+develop 머지
+
 ### Commit message 형식
 
 Subject-only (최소 형식):
