@@ -1,6 +1,6 @@
 ---
 name: init
-description: 빈 디렉토리에서 nidost 워크플로우용 프로젝트를 부트스트랩하는 스킬. 사용자가 "/nidost:init", "nidost 초기화", "프로젝트 시작", "프로젝트 부트스트랩", "새 프로젝트 셋업"을 언급할 때 반드시 트리거하세요.
+description: 빈 디렉토리에서 nidost 워크플로우용 프로젝트를 부트스트랩하는 스킬. docs/doc-guide.md, docs/INDEX.md 등 프로젝트 골격을 생성한다. 사용자가 `/nidost:init` 슬래시 커맨드로 명시 호출할 때만 실행되며 자연어 언급으로 자동 트리거되지 않는다.
 disable-model-invocation: true
 ---
 

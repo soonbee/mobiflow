@@ -1,6 +1,6 @@
 ---
 name: expo-sdk55-unistyles-stack
-description: Scaffold the Expo SDK 55 + Unistyles v3 mobile app at the path defined in `docs/project.config.yaml` `repo.scopes.<scope>.path` (matched by `runtime: react-native-expo` + `framework: expo`). Requires `docs/project.config.yaml` with `repo.scopes.*` populated. Overlays opinionated stack files (ESLint 9 flat config + eslint-config-prettier, Prettier 3, expo-dev-client, smoke:min / smoke scripts, web target disabled — Tier 3) and runs identity substitution. Use when the user asks to "scaffold the mobile app", "set up the RN runtime", or an equivalent request.
+description: Scaffold the Expo SDK 55 + Unistyles v3 mobile app at the path defined in `docs/project.config.yaml` `repo.scopes.<scope>.path` (matched by `runtime: react-native-expo` + `framework: expo`). Requires `docs/project.config.yaml` with `repo.scopes.*` populated. Overlays opinionated stack files (ESLint 9 flat config + eslint-config-prettier, Prettier 3, expo-dev-client, smoke:min / smoke scripts, web target disabled — Tier 3) and runs identity substitution. Triggered only by explicit `/nidost:expo-sdk55-unistyles-stack` slash command — not auto-invoked by natural language.
 disable-model-invocation: true
 ---
 

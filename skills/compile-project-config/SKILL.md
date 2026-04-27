@@ -1,6 +1,6 @@
 ---
 name: compile-project-config
-description: docs/ 스펙 문서(architecture·ui-design 등)와 디스크 상태에서 docs/project.config.yaml을 컴파일하는 단방향 컴파일러 스킬. 사용자가 "/nidost:compile-project-config", "config 갱신", "project.config 컴파일", "프로젝트 config 컴파일"을 언급할 때 반드시 트리거하세요.
+description: docs/ 스펙 문서(architecture·ui-design 등)와 디스크 상태에서 docs/project.config.yaml을 컴파일하는 단방향 컴파일러 스킬. 사용자가 `/nidost:compile-project-config` 슬래시 커맨드로 명시 호출할 때만 실행되며 자연어 언급으로 자동 트리거되지 않는다.
 disable-model-invocation: true
 ---
 
