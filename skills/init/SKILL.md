@@ -64,18 +64,20 @@ KEBAB_NAME=$(echo "$DEFAULT_NAME" | tr '[:upper:] _' '[:lower:]--' | sed 's/[^a-
 
 이 스킬의 `templates/` 디렉토리에서 파일을 프로젝트 루트로 복사합니다. 스킬 디렉토리 경로는 실행 시점에 파악합니다 (예: Claude Code 플러그인의 skill 경로).
 
-| 템플릿 원본              | 복사 대상           | 비고                       |
-| ------------------------ | ------------------- | -------------------------- |
-| `templates/doc-guide.md` | `docs/doc-guide.md` | `docs/` 디렉토리 함께 생성 |
-| `templates/README.md`    | `README.md`         | `{{PROJECT_NAME}}` 치환    |
-| `templates/Makefile`     | `Makefile`          | 그대로 복사                |
-| `templates/gitignore`    | `.gitignore`        | 이름만 `.`을 붙여 복사     |
+| 템플릿 원본                         | 복사 대상                      | 비고                          |
+| ----------------------------------- | ------------------------------ | ----------------------------- |
+| `templates/doc-guide.md`            | `docs/doc-guide.md`            | `docs/` 디렉토리 함께 생성    |
+| `templates/project.config.yaml`     | `docs/project.config.yaml`     | `{{PROJECT_NAME}}` 치환       |
+| `templates/README.md`               | `README.md`                    | `{{PROJECT_NAME}}` 치환       |
+| `templates/Makefile`                | `Makefile`                     | 그대로 복사                   |
+| `templates/gitignore`               | `.gitignore`                   | 이름만 `.`을 붙여 복사        |
 
-복사 후 README의 플레이스홀더를 치환합니다:
+복사 후 플레이스홀더를 치환합니다:
 
 ```bash
 # macOS와 Linux 호환
 sed -i.bak "s/{{PROJECT_NAME}}/${PROJECT_NAME}/g" README.md && rm README.md.bak
+sed -i.bak "s/{{PROJECT_NAME}}/${PROJECT_NAME}/g" docs/project.config.yaml && rm docs/project.config.yaml.bak
 ```
 
 ---
@@ -120,6 +122,7 @@ hotfix/*   ← 긴급 수정 브랜치 (from main → main+develop 머지)
     - Makefile
     - README.md
     - docs/doc-guide.md
+    - docs/project.config.yaml
 
 다음 스킬: nidost:spec-prd
 ```

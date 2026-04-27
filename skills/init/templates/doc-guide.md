@@ -31,6 +31,47 @@ docs/
 
 ---
 
+## 기계 판독 view: `docs/project.config.yaml`
+
+`docs/` 마크다운이 인간 결정의 SSOT라면, `docs/project.config.yaml`은 같은 사실의 **기계 판독 view**다. AI agent·CI·툴이 query하는 라우팅 키(repo 경로, 스택 enum, 패키지 매니저, Node 버전 등)를 단일 YAML로 노출한다.
+
+### 단방향 컴파일러
+
+`docs/<카테고리>/<카테고리>.md` → `docs/project.config.yaml` 단방향. 역방향 금지.
+
+| 측면      | docs/<카테고리>/...md             | docs/project.config.yaml      |
+| --------- | --------------------------------- | ----------------------------- |
+| 소비자    | 인간 (PR 리뷰, 합류자 onboarding) | AI agent, CI, 빌드 스크립트   |
+| 형식      | prose + 다이어그램 + 표           | YAML enum + path + version    |
+| 변경 단위 | spec-* 스킬 + Lock 의례           | compile-project-config 컴파일 |
+| 추적      | git tag `doc/<cat>/v<ver>`        | 일반 commit                   |
+
+### 컴파일 시점
+
+사용자가 `architecture.md` 또는 `ui-design.md`를 변경한 후 명시 호출:
+
+```bash
+/nidost:compile-project-config
+```
+
+`--check` 모드는 drift 감지만 수행 (CI용, 종료 코드로 신호).
+
+### 보존 필드
+
+docs에서 도출 불가능한 필드(`tooling.formatter`, `tooling.test_runner` 등)는 사용자가 직접 편집하고 컴파일러가 보존한다. docs/에 명시된 fact는 항상 docs 기준으로 덮어쓴다.
+
+### SSOT 위반 회피
+
+같은 사실을 두 곳에 쓰지 않는다:
+
+- 결정 근거 → docs/ (prose)
+- 라우팅 키 → project.config.yaml (enum/path)
+- 문서 버전·Lock 상태 → frontmatter + git tag (project.config.yaml에 중복 기록 안 함)
+
+같은 결정의 다른 측면(예: "스타일링 = unistyles"의 *근거*는 architecture.md §9 결정 로그, *라우팅 키*는 project.config.yaml `repo.scopes.mobile.styling`)은 중복이 아니라 자연스러운 분담이다.
+
+---
+
 ## Frontmatter 규격
 
 모든 문서의 최상단에 YAML frontmatter를 작성한다.
@@ -338,19 +379,22 @@ Working → Lock 전환은 두 가지 방법으로 수행한다:
 
 ## 묵시적 Lock 유도
 
-spec-* 스킬은 실행 시작 시점에 **필수 선행 문서들의 상태**를 검사한다. 필수 선행 문서 중 하나라도 Working 상태이면 아래와 같이 사용자에게 Lock을 권유한다:
+spec-* 스킬은 실행 시작 시점에 **필수 선행 문서들의 상태**를 검사한다. 필수 선행 문서 중 하나라도 Working 상태이면 아래와 같이 사용자에게 정보를 표시하고 진행 방식을 묻는다.
+
+nidost는 spec phase의 7개 문서를 연달아 Working으로 작성한 뒤 `/nidost:spec-lock`으로 한 번에 Lock하는 흐름을 1급 워크플로로 가정한다. 따라서 **Working 참조로 그대로 진행이 기본 경로**이며, 선행 문서를 즉시 Lock하고 싶은 특별한 이유가 있을 때만 2번을 고른다.
 
 ```
-⚠️ `<선행 카테고리>`가 v<version> Working 상태입니다.
-   Lock하지 않으면 기반 버전이 불명확한 채로 이 문서가 작성됩니다.
+ℹ️ `<선행 카테고리>`가 v<version> Working 상태입니다.
+   이 문서는 <선행 카테고리>@<version>(Working) 기반으로 작성되며,
+   모든 spec 작성을 마친 뒤 `/nidost:spec-lock`으로 일괄 Lock하세요.
 
-1. 지금 Lock (/nidost:spec-lock <선행 카테고리> 실행)
-2. 현재 Working 상태 그대로 진행 (권장하지 않음)
+1. 그대로 진행 (Working 참조)
+2. 지금 Lock (/nidost:spec-lock <선행 카테고리> 실행)
 3. 종료
 ```
 
-- **1번 선택**: spec-lock 스킬을 호출해 선행 문서를 Lock → 완료 후 현재 스킬 STEP 0 계속
-- **2번 선택**: 현재 스킬 계속 진행. `based_on`에 해당 버전을 기록하되, 주석으로 "Working 참조" 플래그 추가 가능
+- **1번 선택**: 현재 스킬 계속 진행. `based_on`에 해당 버전을 기록하고 `(Working)` 마커를 함께 표기
+- **2번 선택**: spec-lock 스킬을 호출해 선행 문서를 Lock → 완료 후 현재 스킬 STEP 0 계속
 - **3번 선택**: 종료
 
 ---

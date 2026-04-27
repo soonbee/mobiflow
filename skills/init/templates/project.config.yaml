@@ -1,0 +1,23 @@
+# docs/project.config.yaml — 단방향 컴파일러 산출물
+#
+# 본 파일은 /nidost:compile-project-config가 docs/에서 컴파일한다.
+# 직접 편집은 권장하지 않는다 — 다음 컴파일에서 docs 기준으로 덮어써질 수 있다.
+# 컴파일 불가능한 필드(formatter, test_runner 등)만 사용자가 보강한다.
+#
+# 결정 근거: docs/<카테고리>/<카테고리>.md
+# 라우팅 키:  본 파일
+# 같은 사실의 다른 측면이며 SSOT 중복이 아니다.
+
+schema_version: 1
+
+project:
+  name: {{PROJECT_NAME}}
+  type: unknown                    # spec-architecture 후 컴파일러가 확정
+  domain_language: ko
+
+# 아래 섹션은 spec-architecture / spec-ui-design 작성 후
+# /nidost:compile-project-config 실행 시 채워진다.
+repo: {}
+tooling: {}
+phases: {}
+docs: {}
