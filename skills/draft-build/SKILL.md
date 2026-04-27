@@ -15,6 +15,7 @@ allowed-tools:
   - Bash(git tag:*)
   - Bash(git diff:*)
   - Bash(git show:*)
+  - Bash(bash skills/draft-build/scripts/setup-makefile.sh:*)
   - Bash(ls:*)
   - Bash(cd:*)
   - Bash(mkdir:*)
@@ -399,34 +400,32 @@ node docs/ui-drafts/_shared/_tools/capture.mjs \
 
 `viewports:`는 STEP 2에서 이미 기록되어 있어야 한다. 본 단계에서는 `version`·`updated`·`spec-base`(현재 spec 버전 스냅샷)만 갱신. `viewports:`는 변경 금지.
 
-### 5-5. 루트 Makefile `preview` target 관리
+### 5-5. 루트 Makefile `preview` target 관리 + 자동 커밋
 
-사용자가 `make preview` 한 번으로 INDEX 갤러리를 띄울 수 있게 프로젝트 루트 `Makefile`에 target을 보장.
+사용자가 `make preview` 한 번으로 INDEX 갤러리를 띄울 수 있게 프로젝트 루트 `Makefile`에 target을 보장. Makefile은 `docs/ui-drafts/` 외부 산출물이므로 본 스킬이 자기 변경을 직접 커밋해 working tree를 깨끗이 유지합니다 (draft-lock은 이 변경을 다루지 않음 — 책임 경계 분리).
 
-**템플릿 스니펫**: `skills/draft-build/templates/Makefile`
-
-```makefile
-preview:
-	npm --prefix docs/ui-drafts/_shared/_tools run preview
-
-.PHONY: preview
-```
-
-(들여쓰기는 Tab 필수)
-
-**정책** (사용자 소유 루트 Makefile 파괴 방지):
-
-1. 루트 `Makefile` 없음 → 템플릿 그대로 복사
-2. 루트 `Makefile` 있고 `^preview:` 라인 없음 → 템플릿 내용을 파일 끝에 append (앞에 빈 줄 1개 보장). 완료 보고에 "루트 Makefile에 `preview` target 추가됨" 1줄 언급
-3. 루트 `Makefile` 있고 `^preview:` 이미 존재 → 건드리지 않음
-
-**체크**:
+**실행**:
 
 ```bash
-test -f Makefile && grep -q '^preview:' Makefile && echo "exists" || echo "absent-or-no-target"
+RESULT=$(bash skills/draft-build/scripts/setup-makefile.sh)
 ```
 
-`update` 모드에서도 동일 정책.
+스크립트는 4가지 상태를 자체 분기·처리합니다 (사용자 소유 Makefile 파괴 방지 로직 포함). 본 STEP는 결과 코드만 받아 STEP 6-1에 전달.
+
+**결과 코드 → 완료 보고 매핑**:
+
+| RESULT 첫 줄         | 의미                                                               | STEP 6-1 표기                                                              |
+| -------------------- | ------------------------------------------------------------------ | -------------------------------------------------------------------------- |
+| `exists`             | 케이스 3 (이미 존재)                                               | (표기 없음 — no-op)                                                        |
+| `committed-create`   | 케이스 1 (신규 생성 + 자동 커밋)                                   | `루트 Makefile 신규 생성 + 자동 커밋 (build(draft): add make preview target)` |
+| `committed-append`   | 케이스 2 clean (append + 자동 커밋)                                | `루트 Makefile에 preview target 추가 + 자동 커밋`                          |
+| `skipped-dirty`      | 케이스 2 dirty (사전 미커밋 변경 → 자동 추가 skip)                 | `Makefile에 미커밋 변경이 있어 자동 추가 건너뜀. 출력된 스니펫 수동 적용 필요` |
+
+`skipped-dirty`인 경우 스크립트 stdout에 `---` 구분자 뒤로 템플릿 스니펫이 따라옵니다. 사용자에게 그대로 노출.
+
+커밋 메시지의 `build(draft):` 접두어는 draft-lock의 `docs(draft):` 커밋과 구분됩니다 (인프라 변경 vs 문서 산출물 lock).
+
+`update` 모드에서도 동일. 첫 빌드 이후엔 `exists`가 반환되어 자동 no-op.
 
 ---
 
@@ -457,6 +456,8 @@ test -f Makefile && grep -q '^preview:' Makefile && echo "exists" || echo "absen
 
 권장·평론 노트가 있으면 요약 아래에 그대로 인용. 캡처 실패가 있으면 실패 표(화면·variant·viewport·원인)도 함께 출력.
 
+STEP 5-5의 Makefile 처리 결과(`RESULT` 첫 줄)도 1줄 표기. 매핑 표는 STEP 5-5 참조 — `exists`는 표기 없음, 그 외 3종은 해당 행의 "STEP 6-1 표기" 문구 그대로 출력.
+
 ### 6-2. Lifecycle 프롬프트
 
 기본:
@@ -485,3 +486,4 @@ test -f Makefile && grep -q '^preview:' Makefile && echo "exists" || echo "absen
 - **캡처 = HTTP 필수**: `data-include` 탓에 `file://` 금지. 서버 루트 = `docs/ui-drafts/`. `INDEX.html`도 이 전제로 절대 경로 사용
 - **viewports 버전 불변**: `_shared/aesthetic.md` frontmatter의 `viewports:`는 같은 draft 버전 내 변경 금지. 변경은 새 버전에서
 - **draft-revise와의 분담**: 본 스킬은 spec → 시안 빌드 전담. 사용자 자연어 수정 요청·레벨 분류·explore 결정 게이트는 모두 `draft-revise`의 책임
+- **Makefile 책임 경계**: 루트 `Makefile`의 `preview` target은 본 스킬이 직접 추가·커밋한다 (STEP 5-5). draft-lock은 `docs/ui-drafts/`만 다루므로 Makefile 변경을 떠안지 않음. 첫 빌드의 1회성 작업이며 이후 자동 no-op
