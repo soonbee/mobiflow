@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width={VIEWPORT_WIDTH}, initial-scale=1, viewport-fit=cover" />
+  <title>{SCR_ID} · {SCR_TITLE}</title>
+
+  <!-- Fonts (aesthetic.md §4에 선언된 것만) -->
+  {FONT_LINKS}
+
+  <!-- 필수 로드 순서: tokens → phone-shell → status-bar → home-indicator → (추가 partial) → 화면 style -->
+  <link rel="stylesheet" href="/_shared/tokens.css" />
+  <link rel="stylesheet" href="/_shared/partials/phone-shell.css" />
+  <link rel="stylesheet" href="/_shared/partials/status-bar.css" />
+  <link rel="stylesheet" href="/_shared/partials/home-indicator.css" />
+  <!-- {EXTRA_PARTIAL_LINKS} : 이 화면이 쓰는 추가 partial CSS만 여기에 삽입 -->
+
+  <link rel="stylesheet" href="./style.css" />
+  <script src="/_shared/includer.js" defer></script>
+  <script src="./script.js" defer></script>
+</head>
+<body>
+  <main class="phone-shell" data-viewport="mobile" aria-label="{SCR_TITLE}">
+    <div data-include="/_shared/partials/status-bar.html"></div>
+
+    <!-- ===== BODY START — Stage 2는 이 슬롯만 채움 ===== -->
+    {BODY}
+    <!-- ===== BODY END ===== -->
+
+    <div data-include="/_shared/partials/home-indicator.html"></div>
+  </main>
+</body>
+</html>

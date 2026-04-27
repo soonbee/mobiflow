@@ -1,0 +1,15 @@
+{
+  "name": "ui-drafts-capture",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "preview": "node preview.mjs"
+  },
+  "dependencies": {
+    "playwright": "^1.50.0"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}

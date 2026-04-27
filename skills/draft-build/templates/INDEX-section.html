@@ -1,0 +1,25 @@
+<!-- SCR 섹션 템플릿: {SCR_SECTIONS} 자리에 SCR마다 1번 반복 -->
+<section id="{SCR}" class="scr">
+  <header class="scr__head">
+    <h2><span class="id">{SCR}</span>{TITLE}{SCROLL_BADGE}</h2>
+  </header>
+  <div class="scr__row">
+    {MOCKUPS}
+  </div>
+</section>
+
+<!-- mockup 템플릿 (chassis 적용, {PRIMARY_VP.name} == mobile) -->
+<figure class="mockup">
+  <div class="device-chassis">
+    <iframe src="/{SCR}/{REL}" width="{PRIMARY_VP.width}" height="{PRIMARY_VP.height}" loading="lazy" title="{SCR} {LABEL}"></iframe>
+  </div>
+  <figcaption>{LABEL}</figcaption>
+</figure>
+
+<!-- mockup 템플릿 (chassis 미적용, 그 외 viewport) -->
+<figure class="mockup">
+  <div class="device-frame-plain">
+    <iframe src="/{SCR}/{REL}" width="{PRIMARY_VP.width}" height="{PRIMARY_VP.height}" loading="lazy" title="{SCR} {LABEL}"></iframe>
+  </div>
+  <figcaption>{LABEL}</figcaption>
+</figure>

@@ -1,0 +1,48 @@
+/* _shared/partials/phone-shell.css
+ *
+ * 모바일 phone shell 규약. 화면 style.css에서 .phone-shell 속성 재정의 금지.
+ * --shell-* = 목업 에뮬레이션 전용 토큰 (tokens.css에 넣지 않음, draft 폐기 시 함께 사라짐).
+ * design token (--color-*, --font-*, --text-*) 참조는 tokens.css에서 해결.
+ *
+ * 전역 reset: 브라우저 기본 body margin(8px × 2 = 16px)이 document.scrollHeight에
+ * 덧씌워져 모든 빈 상태 화면에서 scroll ratio가 1.02로 부풀고 capture.mjs의
+ * SCROLL_RATIO_THRESHOLD(1.1) 경계 화면에 가짜 full 샷이 생성된다. phone-shell이
+ * "body 전체 = 뷰포트 1:1"을 전제하므로 전역 reset은 스코프 규약을 깨지 않는 구조적 필수.
+ */
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+.phone-shell {
+  /* --- 목업 에뮬레이션 전용 토큰 --- */
+  --shell-viewport-w: 390px;          /* aesthetic.md viewports.width와 일치 */
+  --shell-viewport-h: 844px;          /* aesthetic.md viewports.height와 일치 */
+  --shell-status-bar-h: 44px;
+  --shell-home-indicator-h: 34px;
+  --shell-safe-top: var(--shell-status-bar-h);
+  --shell-safe-bottom: var(--shell-home-indicator-h);
+
+  /* --- 구조 규칙 (viewport lock · 변경 금지) ---
+   * 모바일 앱 목업은 뷰포트에 고정되어 body는 스크롤하지 않는다. status-bar·home-indicator는
+   * flex 고정 행으로 잠그고, 본문 wrapper가 유일한 scroll container가 되게 한다. min-height로
+   * 풀어주면 (1) status-bar가 본문과 함께 밀림 (2) 빈 상태에서도 1.02 오버플로우 (3) 모달/시트가
+   * body 전체를 스크롤함 — 세 증상이 동시에 재현된다.
+   */
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+
+  /* --- 시각 바인딩 (tokens.css의 design token 참조) --- */
+  background: var(--color-canvas);
+  color: var(--color-fg-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-body, 15px);
+  line-height: 1.5;
+}

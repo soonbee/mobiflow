@@ -1,0 +1,77 @@
+/* _shared/partials/status-bar.css */
+.status-bar {
+  position: relative;
+  height: var(--shell-status-bar-h);
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 0 0 auto;               /* phone-shell flex column에서 고정 행으로 잠금 */
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-fg-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.status-bar__time {
+  z-index: 1;
+  letter-spacing: 0.2px;
+}
+
+.status-bar__island {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 126px;
+  height: 37px;
+  background: #000;
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+.status-bar__indicators {
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.status-bar__icon {
+  width: 16px;
+  height: 11px;
+  fill: currentColor;
+}
+
+.status-bar__battery {
+  position: relative;
+  display: inline-block;
+  width: 26px;
+  height: 12px;
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  box-sizing: border-box;
+}
+
+.status-bar__battery::before {
+  content: "";
+  position: absolute;
+  inset: 1.5px;
+  width: calc(100% - 3px);
+  background: currentColor;
+  border-radius: 1px;
+  transform-origin: left center;
+  transform: scaleX(0.8);
+}
+
+.status-bar__battery::after {
+  content: "";
+  position: absolute;
+  right: -2px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2px;
+  height: 5px;
+  background: currentColor;
+  border-radius: 0 1px 1px 0;
+}
