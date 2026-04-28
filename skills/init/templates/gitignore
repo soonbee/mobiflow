@@ -17,3 +17,6 @@ Thumbs.db
 
 # UI draft screenshots (generated)
 docs/ui-drafts/**/screenshots/
+
+# Per-ticket git worktrees (dev-from-ticket)
+worktrees/
