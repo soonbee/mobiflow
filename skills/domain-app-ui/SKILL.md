@@ -101,6 +101,43 @@ iOS와 Android에서 시각적·동작적 차이가 있는 부분은 `Platform.O
 
 `with-ui-draft`이 함께 로드되어 있으면 그 가이드를 따라 시안을 해석. 본 스킬은 시안과 무관한 모바일 보편 원칙을 다룸. 두 스킬은 보완 관계.
 
+## no-op prop 금지
+
+동작을 *활성화*하는 의미가 강한 prop에 빈 배열·`null`·`false` 같은 무력화 값을 **리터럴로 직접 작성하지 않는다**. 필요 없으면 prop 자체를 제거.
+
+식별 기준 (둘 다 만족 시 적용):
+
+- **이름 패턴**: `*Indices`, `enable*`, `*Enabled`, `sticky*`, `*Visible`, `keyboard*` 등 동작 활성화 의미가 강한 네이밍
+- **값 형태**: 코드에 *직접 작성된* 리터럴(`[]`, `null`, `false`, `0`). 런타임 변수·prop 전달은 해당 없음
+
+대표적인 자기-모순 패턴:
+
+```tsx
+// ❌ 외피만 만들고 활성화 누락 — 동작이 무력화됨
+<FlatList stickyHeaderIndices={[]} ... />
+<FlatList data={[]} renderItem={() => null} ListHeaderComponent={...} />
+<KeyboardAvoidingView enabled={false} ... />
+
+// ✅ 동작이 필요 없으면 prop 자체 제거
+<FlatList data={items} renderItem={renderItem} />
+```
+
+`data={items}` (items가 빈 배열일 수 있음), `disabled={false}` 같은 일반적 prop은 해당 없음 — 위 두 기준을 동시에 만족할 때만 플래그 대상이다.
+
+## scaffolding 비활성 명시
+
+위 「no-op prop 금지」를 위반하는 코드가 *의도된 비활성*인 경우(점진적 구현·feature flag·다음 티켓 분리 등) 한 줄 주석으로 **사유와 활성화 시점**을 명시한다. 주석이 없으면 review가 "미완"으로 간주한다.
+
+```tsx
+// ✅ 의도된 비활성을 주석으로 명시
+<FlatList
+  stickyHeaderIndices={[]} // TODO(t14): enable after sectioning header
+  ...
+/>
+```
+
+이 규칙은 정당한 점진 구현은 통과시키고, "본인도 비어있는 줄 모르는" 잠복 미완 코드만 잡아낸다.
+
 ## 하지 않는 것
 
 이 스킬의 범위는 UI 구현이다. 아래 항목은 별도 단계에서 처리한다.

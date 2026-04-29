@@ -81,12 +81,37 @@ iOS와 Android 사용자는 각 플랫폼 패턴을 기대.
 - **타이머/인터벌**: 백그라운드 진입 시 정리, 복귀 시 재시작
 - **음악/영상 재생**: 인터럽트(전화 등) 처리
 
+### 8. no-op prop / 자기-모순 패턴 탐지
+
+동작을 *활성화*하는 prop에 리터럴 무력화 값(`[]`·`null`·`false`)이 직접 작성된 라인은 "외피만 만들고 활성화 까먹음"의 대표 신호다. `domain-app-ui` 「no-op prop 금지」 규칙의 리뷰 측 짝.
+
+식별 패턴 (둘 다 만족 시 플래그):
+
+- **이름 패턴**: `*Indices`, `enable*`, `*Enabled`, `sticky*`, `*Visible`, `keyboard*` 등 동작 활성화 의미가 강한 네이밍
+- **값 형태**: 코드에 직접 작성된 리터럴 무력화 값
+
+판정:
+
+- **🔴**: 위 패턴이 발견되고 의도된 비활성을 명시하는 한 줄 주석이 없는 경우
+- **🟡**: 주석은 있으나 활성화 시점·사유가 모호한 경우 (예: `// TODO`만 단독)
+
+대표적인 자기-모순 조합:
+
+| 패턴 | 의심 |
+|---|---|
+| `<FlatList stickyHeaderIndices={[]} ListHeaderComponent={...}>` | sticky 의도 외피만 만들고 인덱스 비움 |
+| `<FlatList data={[]} renderItem={() => null} ListHeaderComponent={...}>` | FlatList를 ScrollView 대용으로 쓰는 안티패턴 — 보통 sticky 또는 스크롤 의도 누락 |
+| `<KeyboardAvoidingView enabled={false}>` | 키보드 회피 의도 무력화 |
+| `<Modal visible={false}>` (조건 없이 상수) | 모달이 영구 비활성 |
+
+`disabled={false}`, `data={items}` 같은 일반 prop은 해당 없음 — 위 두 기준을 동시에 만족할 때만 본다.
+
 ## 출력 통합
 
 본 스킬도 `review-ui-common`처럼 단독 출력 형식이 없다. `code-reviewer` 에이전트가 Part A 항목으로 통합 (area에 모바일 특화 카테고리 명시).
 
 ### Severity 가이드 (특화)
 
-- **🔴**: Safe Area 미적용, 시스템 제스처 가로채기, 메인 스레드 블로킹, 메모리 문제로 크래시 가능
-- **🟡**: 네이티브 패턴 불일치, 제스처 충돌, 오프라인 미처리, 이미지 캐싱 누락
+- **🔴**: Safe Area 미적용, 시스템 제스처 가로채기, 메인 스레드 블로킹, 메모리 문제로 크래시 가능, no-op prop / 자기-모순 패턴(주석 없음)
+- **🟡**: 네이티브 패턴 불일치, 제스처 충돌, 오프라인 미처리, 이미지 캐싱 누락, no-op prop 주석 모호
 - **pass**: 발견 사항 없음
