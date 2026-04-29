@@ -1,0 +1,24 @@
+# Stack profile: Expo SDK 55 + Unistyles v3
+#
+# 본 프로파일이 활성화되는 조건은 match 블록 참조.
+# stack-resolver가 docs/project.config.yaml의 scope와 비교해 매칭한다.
+#
+# 동일 스택을 부트스트랩하는 scaffolder는 skills/expo-sdk55-unistyles-stack/.
+# 두 자산은 시점·책임이 다르며 (scaffold = dev 이전, profile = dev 중) 별도 유지.
+# 버전 업그레이드 시 둘 다 함께 갱신 필요.
+
+id: expo-sdk55-unistyles3
+
+# scope의 사실(repo.scopes.<key>)이 모두 일치해야 함
+# 생략된 필드는 와일드카드 (어떤 값이든 매칭)
+match:
+  runtime: react-native-expo
+  framework: expo
+  framework_version: ~55          # 메이저 55 매칭 (~55 / ^55 / 55.x.x 모두 OK)
+  styling: unistyles
+  styling_version: ^3             # 메이저 3 매칭
+
+# 활성화 시 dev-from-ticket이 code-engineer/code-reviewer에 로드 지시할 use-* 스킬
+skills:
+  - use-expo-sdk55
+  - use-unistyles3

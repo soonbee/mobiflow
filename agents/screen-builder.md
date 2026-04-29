@@ -2,7 +2,7 @@
 name: screen-builder
 description: 정적 UI 시안의 작성자. 호출 모드(full-build / single-scr / patch / explore)에 따라 _shared/와 SCR 디렉토리를 생성·갱신한다. 시안 빌드, 화면별 시안 작성, 토큰 변경 적용, 비교 시안 생성에 사용한다.
 tools: Read, Write, Edit, Bash, Grep, Glob
-model: opus
+model: claude-opus-4-6
 skills:
   - draft-conventions
 ---
