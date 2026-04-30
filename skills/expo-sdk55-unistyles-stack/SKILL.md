@@ -192,8 +192,10 @@ Use the `Edit` tool, not `sed`, for JSON edits. Target file: `<MOBILE_PATH>/pack
 1. Set `"main"` to `"index.ts"` (was `"expo-router/entry"`).
 2. Set `"name"` to `<projectName>`.
 3. Set `"version"` to `"0.0.1"`.
-4. Remove scripts: `"web"`, `"reset-project"`.
-5. Add scripts in this order after `"lint"`:
+4. Replace `"android"` value with `"expo run:android"` (was `"expo start --android"`).
+5. Replace `"ios"` value with `"expo run:ios"` (was `"expo start --ios"`).
+6. Remove scripts: `"web"`, `"reset-project"`.
+7. Add scripts in this order after `"lint"`:
    ```json
    "lint:fix": "expo lint -- --fix",
    "format": "prettier --write .",
@@ -201,7 +203,7 @@ Use the `Edit` tool, not `sed`, for JSON edits. Target file: `<MOBILE_PATH>/pack
    "smoke:min": "tsc --noEmit && npm run lint && npm run format:check && npx expo-doctor",
    "smoke": "npm run smoke:min && npx expo export --platform ios --no-minify --no-bytecode --output-dir .expo/smoke-bundle && rm -rf .expo/smoke-bundle"
    ```
-6. Remove from `dependencies`: `@react-navigation/bottom-tabs`, `@react-navigation/elements`, `expo-device`, `expo-glass-effect`, `expo-symbols`, `expo-web-browser`, `react-dom`, `react-native-web`.
+8. Remove from `dependencies`: `@react-navigation/bottom-tabs`, `@react-navigation/elements`, `expo-device`, `expo-glass-effect`, `expo-symbols`, `expo-web-browser`, `react-dom`, `react-native-web`.
 
 Do **not** remove other packages (`@react-navigation/native`, `react-native-gesture-handler`, etc.). They're retained intentionally.
 
