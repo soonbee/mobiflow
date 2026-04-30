@@ -109,6 +109,8 @@ requests:
 
 ### 2-1. 분류 휴리스틱
 
+draft phase 내부 분류 (L1·L2):
+
 | 신호                                                        | 추정 레벨 |
 | ----------------------------------------------------------- | --------- |
 | target = 단일 SCR + aspect = color/size/spacing/layout      | L1 in-scope |
@@ -116,8 +118,8 @@ requests:
 | `multi_compare: true`                                       | L1-explore |
 | target = 전체 + aspect = color/size/spacing + 토큰 추가·삭제·의미 변경 | L2 |
 | aesthetic.md 금지 목록·색 분포 규칙 변경 요구               | L2 |
-| 새 화면 추가, 새 UI 요소(버튼·필드 등) 추가, 새 상태(로딩/에러) 추가 | L3 |
-| 사용자 플로우 변경, 화면 간 이동 변경                       | L3 |
+
+**L3(spec phase 재진입)** 판정은 `doc-guide.md` §「spec 영향도 판정 휴리스틱」을 SSOT로 한다. MAJOR 신호(새 화면/라우트/페이지, `ui-design`/`architecture`/`user-journey` 변경 필요, 새 도메인 모델·API 엔드포인트, 사용자 플로우 변경)는 모두 L3. 추가로 본 스킬은 `design-tokens.md` 외 spec 문서(예: `ui-design.md`)는 직접 patch하지 않으므로, doc-guide MINOR 중 design-tokens 외 변경도 L3로 escalate한다 (자세한 표는 doc-guide 참조, 본 스킬에 사본 두지 않음).
 
 휴리스틱은 **참고**일 뿐. 모호하면 STEP 2-2의 사용자 확인에서 정정한다.
 
