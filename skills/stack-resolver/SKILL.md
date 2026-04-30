@@ -83,7 +83,7 @@ detected:
 candidates_checked: 3
 suggestions:
   - "프로파일 expo-sdk54-unistyles3 추가 (skills/stack-resolver/profiles/)"
-  - "config의 framework_version을 ~55로 변경 후 /nidost:compile-project-config 재실행"
+  - "config의 framework_version을 ~55로 변경 후 /mobiflow:compile-project-config 재실행"
 ```
 
 ### 매칭 중복 (`status: ambiguous`)
@@ -178,7 +178,7 @@ test -f docs/project.config.yaml
 
 ```yaml
 status: invalid
-reason: "docs/project.config.yaml 없음. /nidost:compile-project-config 실행 필요"
+reason: "docs/project.config.yaml 없음. /mobiflow:compile-project-config 실행 필요"
 ```
 
 ### 0-2. profiles 디렉토리

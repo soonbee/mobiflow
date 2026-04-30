@@ -1,6 +1,6 @@
 ---
 name: expo-sdk55-unistyles-stack
-description: Scaffold the Expo SDK 55 + Unistyles v3 mobile app at the path defined in `docs/project.config.yaml` `repo.scopes.<scope>.path` (matched by `runtime: react-native-expo` + `framework: expo`). Requires `docs/project.config.yaml` with `repo.scopes.*` populated. Overlays opinionated stack files (ESLint 9 flat config + eslint-config-prettier, Prettier 3, expo-dev-client, smoke:min / smoke scripts, web target disabled — Tier 3) and runs identity substitution. Triggered only by explicit `/nidost:expo-sdk55-unistyles-stack` slash command — not auto-invoked by natural language.
+description: Scaffold the Expo SDK 55 + Unistyles v3 mobile app at the path defined in `docs/project.config.yaml` `repo.scopes.<scope>.path` (matched by `runtime: react-native-expo` + `framework: expo`). Requires `docs/project.config.yaml` with `repo.scopes.*` populated. Overlays opinionated stack files (ESLint 9 flat config + eslint-config-prettier, Prettier 3, expo-dev-client, smoke:min / smoke scripts, web target disabled — Tier 3) and runs identity substitution. Triggered only by explicit `/mobiflow:expo-sdk55-unistyles-stack` slash command — not auto-invoked by natural language.
 disable-model-invocation: true
 ---
 
@@ -18,7 +18,7 @@ Invoke when you want to bootstrap the RN runtime with the opinionated Expo SDK 5
 
 Do **not** run to "update" an existing project — this skill creates a new project via `create-expo-app`.
 
-> Where this skill sits in the broader nidost workflow (relative to spec/draft/dev phases) is documented in `README.md`, not here. This skill only enforces its config precondition.
+> Where this skill sits in the broader mobiflow workflow (relative to spec/draft/dev phases) is documented in `README.md`, not here. This skill only enforces its config precondition.
 
 ## Required config (precondition, runs first)
 
@@ -38,7 +38,7 @@ repo:
 
 If `docs/project.config.yaml` does not exist, abort:
 
-> ❌ `docs/project.config.yaml`을 찾을 수 없습니다. `/nidost:compile-project-config`로 컴파일하세요.
+> ❌ `docs/project.config.yaml`을 찾을 수 없습니다. `/mobiflow:compile-project-config`로 컴파일하세요.
 
 ### Scope match
 
@@ -46,7 +46,7 @@ Find scopes in `repo.scopes` where `runtime == "react-native-expo"` AND `framewo
 
 | Match count | Action                                                                                                                                                                                |
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 0           | abort: "config에 Expo RN scope가 없습니다. `/nidost:compile-project-config`로 갱신하세요."                                                                                              |
+| 0           | abort: "config에 Expo RN scope가 없습니다. `/mobiflow:compile-project-config`로 갱신하세요."                                                                                              |
 | 1           | proceed. Store this scope's `path` as `<MOBILE_PATH>` and its key as `<SCOPE>`. All subsequent steps use these variables.                                                               |
 | 2+          | abort: "config에 Expo RN scope가 여러 개({SCOPE_NAMES})입니다. 본 스킬은 단일 RN 앱만 지원합니다. config를 검토하거나 scope를 명시하는 sibling 스킬을 사용하세요."                       |
 
@@ -341,10 +341,10 @@ Next steps (from project root):
 Real device/simulator builds (first time only):
 - cd <MOBILE_PATH> && npx expo prebuild --clean
 
-권장: /nidost:compile-project-config --check
+권장: /mobiflow:compile-project-config --check
        (디스크-config 정합성 확인 — 본 스킬이 만든 디렉토리가 config와 일치하는지 검증)
 
-다음 스킬: /nidost:ticket
+다음 스킬: /mobiflow:ticket
 ```
 
 ## Notes for future maintenance of this skill

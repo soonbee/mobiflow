@@ -1,6 +1,6 @@
 ---
 name: spec-prd
-description: 모호한 아이디어를 PRD 초안으로 구체화하는 스킬. 사용자가 "/nidost:spec-prd", "PRD 작성", "아이디어 구체화", "제품 기획", "PRD 초안 작성"을 언급할 때 반드시 트리거하세요.
+description: 모호한 아이디어를 PRD 초안으로 구체화하는 스킬. 사용자가 "/mobiflow:spec-prd", "PRD 작성", "아이디어 구체화", "제품 기획", "PRD 초안 작성"을 언급할 때 반드시 트리거하세요.
 disable-model-invocation: true
 ---
 
@@ -24,7 +24,7 @@ disable-model-invocation: true
 CURRENT_BRANCH=$(git symbolic-ref --short HEAD 2>/dev/null)
 if [ "$CURRENT_BRANCH" = "main" ]; then
   if ! git show-ref --verify --quiet refs/heads/develop; then
-    echo "❌ develop 브랜치가 없습니다. /nidost:init으로 먼저 부트스트랩해주세요."
+    echo "❌ develop 브랜치가 없습니다. /mobiflow:init으로 먼저 부트스트랩해주세요."
     exit 1
   fi
   if [ -n "$(git status --porcelain)" ]; then
@@ -45,7 +45,7 @@ test -f docs/doc-guide.md
 
 없으면 다음 메시지를 출력하고 종료:
 
-> ❌ `docs/doc-guide.md`를 찾을 수 없습니다. 먼저 `/nidost:init`으로 프로젝트를 부트스트랩해주세요.
+> ❌ `docs/doc-guide.md`를 찾을 수 없습니다. 먼저 `/mobiflow:init`으로 프로젝트를 부트스트랩해주세요.
 
 ### 0-2. PRD 선점 확인
 
@@ -55,7 +55,7 @@ test -f docs/prd/prd.md
 
 존재하면 다음 메시지를 출력하고 종료:
 
-> ❌ `docs/prd/prd.md`가 이미 존재합니다. 기존 PRD 수정은 이 스킬에서 지원하지 않습니다. 파일을 직접 편집하거나, 후속 버전 갱신은 `/nidost:plan-next`를 사용하세요.
+> ❌ `docs/prd/prd.md`가 이미 존재합니다. 기존 PRD 수정은 이 스킬에서 지원하지 않습니다. 파일을 직접 편집하거나, 후속 버전 갱신은 `/mobiflow:plan-next`를 사용하세요.
 
 ### 0-3. 프로젝트명 추출
 
@@ -216,17 +216,17 @@ updated: {YYYY-MM-DD}
 모든 파일 생성을 마친 뒤 아래 형식으로 완료 요약을 표시한 다음, `docs/doc-guide.md`의 「작성 완료 Lifecycle 프롬프트」 절차를 수행합니다.
 
 ```
-✅ nidost spec-prd v0.1.0 작성 완료
+✅ mobiflow spec-prd v0.1.0 작성 완료
 
   프로젝트:   {PROJECT_NAME}
   문서:       docs/prd/prd.md
   CHANGELOG:  docs/prd/CHANGELOG.md
   INDEX:      docs/INDEX.md 갱신
 
-다음 스킬 후보: nidost:spec-user-journey
+다음 스킬 후보: mobiflow:spec-user-journey
 ```
 
-요약 직후 「작성 완료 Lifecycle 프롬프트」의 3-way 선택(Lock / Working 유지 종료 / 추가 편집)을 제시하고, 사용자 선택에 따라 해당 절차를 그대로 따릅니다. Lock은 `/nidost:spec-lock prd` 호출로 위임하며, 본 스킬이 직접 `git commit`·`git tag`를 실행하지 않습니다.
+요약 직후 「작성 완료 Lifecycle 프롬프트」의 3-way 선택(Lock / Working 유지 종료 / 추가 편집)을 제시하고, 사용자 선택에 따라 해당 절차를 그대로 따릅니다. Lock은 `/mobiflow:spec-lock prd` 호출로 위임하며, 본 스킬이 직접 `git commit`·`git tag`를 실행하지 않습니다.
 
 ---
 
@@ -235,7 +235,7 @@ updated: {YYYY-MM-DD}
 - 이 스킬은 **신규 PRD 최초 작성 전용**입니다. 기존 `docs/prd/prd.md`가 있으면 STEP 0에서 차단됩니다. 후속 버전 갱신은 별도 스킬이 담당합니다.
 - 저장 경로는 `docs/prd/prd.md`로 고정됩니다.
 - 최초 버전은 항상 `0.1.0`으로 시작합니다. 버전을 임의로 올리지 않습니다.
-- Lock(commit + tag)은 `/nidost:spec-lock` 스킬이 담당합니다. 본 스킬은 직접 수행하지 않습니다.
+- Lock(commit + tag)은 `/mobiflow:spec-lock` 스킬이 담당합니다. 본 스킬은 직접 수행하지 않습니다.
 - 추가 편집이 필요하면 「작성 완료 Lifecycle 프롬프트」의 3번 경로(섹션 단위 편집 루프)를 따릅니다. Working 버전 번호는 유지되며 CHANGELOG는 루프 종료 시점에 한 번만 정리됩니다.
 - PRD 본문 내 `## Changelog` 섹션을 만들지 않습니다. 별도 `CHANGELOG.md`가 유일한 변경 이력 소스입니다.
 

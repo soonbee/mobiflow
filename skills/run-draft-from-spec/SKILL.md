@@ -1,6 +1,6 @@
 ---
 name: run-draft-from-spec
-description: Lock된 ui-design·design-tokens를 기반으로 `docs/ui-drafts/` 정적 UI 시안 번들(공통자산·화면별 HTML·스크린샷)을 빌드·검수·캡처하는 draft phase 오케스트레이터. 사용자가 "/nidost:run-draft-from-spec", "draft 빌드", "UI 시안 작성", "ui-drafts 생성"을 언급할 때 반드시 트리거하세요.
+description: Lock된 ui-design·design-tokens를 기반으로 `docs/ui-drafts/` 정적 UI 시안 번들(공통자산·화면별 HTML·스크린샷)을 빌드·검수·캡처하는 draft phase 오케스트레이터. 사용자가 "/mobiflow:run-draft-from-spec", "draft 빌드", "UI 시안 작성", "ui-drafts 생성"을 언급할 때 반드시 트리거하세요.
 allowed-tools:
   - Read
   - Write
@@ -58,7 +58,7 @@ done
 ```
 
 - 둘 중 하나라도 Lock이 아님 → 사용자에게 안내 후 선택:
-  > ⚠️ `{카테고리}`가 Working 상태입니다. draft 작성 전 `/nidost:spec-lock {카테고리}`로 Lock하는 것을 권장합니다.
+  > ⚠️ `{카테고리}`가 Working 상태입니다. draft 작성 전 `/mobiflow:spec-lock {카테고리}`로 Lock하는 것을 권장합니다.
   >
   > 1. 지금 Lock
   > 2. Working 상태 그대로 진행 (재현성 약화)
@@ -413,7 +413,7 @@ test -f Makefile && grep -q '^preview:' Makefile && echo "exists" || echo "absen
 >
 > 1. Lock (`git commit` + `git tag draft/v{VERSION}`)
 > 2. Working 상태 유지 (추가 화면 작성 또는 수동 편집 예정)
-> 3. dev phase로 바로 진입 (`/nidost:run-app-ui-from-draft` 또는 dev-segment-router)
+> 3. dev phase로 바로 진입 (`/mobiflow:run-app-ui-from-draft` 또는 dev-segment-router)
 
 캡처 실패 F>0인 경우 옵션 추가:
 > 4. 캡처만 재시도 (build/review는 건드리지 않고 STEP 4만 다시 실행)

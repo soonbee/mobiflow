@@ -1,6 +1,6 @@
 ---
 name: init
-description: 빈 디렉토리에서 nidost 워크플로우용 프로젝트를 부트스트랩하는 스킬. docs/doc-guide.md, docs/INDEX.md 등 프로젝트 골격을 생성한다. 사용자가 `/nidost:init` 슬래시 커맨드로 명시 호출할 때만 실행되며 자연어 언급으로 자동 트리거되지 않는다.
+description: 빈 디렉토리에서 mobiflow 워크플로우용 프로젝트를 부트스트랩하는 스킬. docs/doc-guide.md, docs/INDEX.md 등 프로젝트 골격을 생성한다. 사용자가 `/mobiflow:init` 슬래시 커맨드로 명시 호출할 때만 실행되며 자연어 언급으로 자동 트리거되지 않는다.
 disable-model-invocation: true
 ---
 
@@ -115,7 +115,7 @@ hotfix/*   ← 긴급 수정 브랜치 (from main → main+develop 머지)
 모든 단계 완료 후 아래 형식으로 보고합니다:
 
 ```
-✅ nidost init 완료
+✅ mobiflow init 완료
 
   프로젝트:   {PROJECT_NAME}
   브랜치:     main, develop (git-flow)
@@ -128,7 +128,7 @@ hotfix/*   ← 긴급 수정 브랜치 (from main → main+develop 머지)
     - docs/spec-backlog.md
     - docs/spec-backlog-archive.md
 
-다음 스킬: nidost:spec-prd
+다음 스킬: mobiflow:spec-prd
 ```
 
 ---

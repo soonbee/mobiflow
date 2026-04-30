@@ -1,5 +1,5 @@
 {
-  "name": "nidost",
+  "name": "mobiflow",
   "version": "0.1.0",
   "description": "Spec-driven development workflow marketplace.",
   "owner": {
@@ -7,7 +7,7 @@
   },
   "plugins": [
     {
-      "name": "nidost",
+      "name": "mobiflow",
       "version": "0.1.0",
       "description": "Spec-driven development workflow with skills and sub-agents (PRD → design → ticketing → TDD → review → QA).",
       "source": "./"

@@ -1,5 +1,5 @@
 {
-  "name": "nidost",
+  "name": "mobiflow",
   "version": "0.1.0",
   "description": "Spec-driven development workflow: skills and sub-agents that orchestrate PRD → design → ticketing → TDD → review → QA cycles.",
   "author": {

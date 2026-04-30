@@ -6,7 +6,7 @@ description: >
   같은 폴더의 _index.md(상태 SSOT)에 신규 행을 append한다. UI 티켓은 SCR-xxx 시안을 참조 경로로
   연결하고, dev-from-ticket이 라우팅에 사용할 scope·domain·data_source를 frontmatter에 사전 기록한다.
   기존 티켓의 수정·철회·재라우팅은 `ticket-edit` 스킬에서 처리한다.
-  사용자가 `/nidost:ticket`을 입력할 때 트리거하세요.
+  사용자가 `/mobiflow:ticket`을 입력할 때 트리거하세요.
 disable-model-invocation: true
 allowed-tools:
   - Read
@@ -39,8 +39,8 @@ allowed-tools:
 
 | 형식 | 동작 |
 |---|---|
-| `/nidost:ticket` | [spec 모드] 설계 문서 전체를 스캔해 미구현 기능을 티켓으로 일괄 생성 |
-| `/nidost:ticket {자유 설명}` | [사용자 입력 모드] 사용자 설명에 대해서만 티켓 생성 (필요 시 여러 개로 분리) |
+| `/mobiflow:ticket` | [spec 모드] 설계 문서 전체를 스캔해 미구현 기능을 티켓으로 일괄 생성 |
+| `/mobiflow:ticket {자유 설명}` | [사용자 입력 모드] 사용자 설명에 대해서만 티켓 생성 (필요 시 여러 개로 분리) |
 
 사용자 입력 모드가 다루는 전형적 3종:
 
@@ -57,7 +57,7 @@ allowed-tools:
 ### 0-1. 필수 선행 문서 존재 확인
 
 ```bash
-test -f docs/prd/prd.md || { echo "❌ docs/prd/prd.md 없음. /nidost:spec-prd 먼저 실행"; exit 1; }
+test -f docs/prd/prd.md || { echo "❌ docs/prd/prd.md 없음. /mobiflow:spec-prd 먼저 실행"; exit 1; }
 ```
 
 prd.md frontmatter에서 `version`을 추출해 `{PRD_VERSION}`으로 보관.
@@ -65,12 +65,12 @@ prd.md frontmatter에서 `version`을 추출해 `{PRD_VERSION}`으로 보관.
 ### 0-2. project.config.yaml 존재 확인
 
 ```bash
-test -f docs/project.config.yaml || { echo "❌ docs/project.config.yaml 없음. /nidost:compile-project-config 실행"; exit 1; }
+test -f docs/project.config.yaml || { echo "❌ docs/project.config.yaml 없음. /mobiflow:compile-project-config 실행"; exit 1; }
 ```
 
 config의 `repo.scopes`를 로드해 `{SCOPE_KEYS}`로 보관. 비어있으면 abort:
 
-> ❌ `docs/project.config.yaml`의 `repo.scopes`가 비어있습니다. architecture·init이 완료되었는지 확인하고 `/nidost:compile-project-config`를 재실행하세요.
+> ❌ `docs/project.config.yaml`의 `repo.scopes`가 비어있습니다. architecture·init이 완료되었는지 확인하고 `/mobiflow:compile-project-config`를 재실행하세요.
 
 `{SCOPE_KEYS}`가 정확히 1개면 `{SINGLE_SCOPE}=true`로 보관 (자동 추론에 사용).
 
@@ -80,7 +80,7 @@ config의 `repo.scopes`를 로드해 `{SCOPE_KEYS}`로 보관. 비어있으면 a
 
 | 상태 | UI_MODE | 후속 STEP 분기 |
 |---|---|---|
-| 파일 없음 | — | "❌ `docs/ui-design/ui-design.md` 없음. `/nidost:spec-ui-design` 먼저 실행" 출력 후 종료 |
+| 파일 없음 | — | "❌ `docs/ui-design/ui-design.md` 없음. `/mobiflow:spec-ui-design` 먼저 실행" 출력 후 종료 |
 | §0 없음 (표준 UI 프로젝트) | `ui-normal` | 정상 진행 (SCR-xxx 체계) |
 | §0 존재 + A2형 스킵 명시 | `ui-none` | STEP 0-4 스킵, STEP 1-1 ui-design·ui-drafts INDEX 로드 스킵, STEP 2-3 도메인은 `contract`로 강제, frontmatter `scr` 생략 |
 | §0 존재 + 재해석 모드 | `ui-reinterpreted` | 정상 진행. SCR-xxx 대신 ui-design.md의 재해석 ID 체계(CMD-xxx / EP-xxx / PAGE-xxx 등) 사용. ui-drafts도 해당 ID 체계로 존재한다고 가정 |
@@ -97,7 +97,7 @@ test -d docs/ui-drafts && test -f docs/ui-drafts/INDEX.md
 
 > ⚠️ `docs/ui-drafts/`가 없습니다. UI 티켓은 시안을 참조 경로로 가리켜야 합니다.
 >
-> 1. draft phase 먼저 실행 (`/nidost:draft-build`) — 권장
+> 1. draft phase 먼저 실행 (`/mobiflow:draft-build`) — 권장
 > 2. UI 시안 없이 contract 티켓만 생성 (UI 티켓 제외)
 > 3. 종료
 
@@ -115,7 +115,7 @@ ls docs/tickets/v{PRD_VERSION}/ 2>/dev/null | grep -E '^[0-9]+\.md$' | sed 's/\.
 
 사전식 정렬 함정(`10.md < 2.md`)을 피하기 위해 반드시 숫자 정렬(`sort -n`). 비어있으면 `{NEXT_NUMBER}=1`, 아니면 `최대값 + 1`.
 
-**재호출 규약**: `/nidost:ticket` 재호출은 **증분**. 기존 `{N}.md` 파일과 `_index.md` 기존 행은 절대 덮어쓰지 않으며, 신규 번호만 append. 상세 규칙은 STEP 4-6.
+**재호출 규약**: `/mobiflow:ticket` 재호출은 **증분**. 기존 `{N}.md` 파일과 `_index.md` 기존 행은 절대 덮어쓰지 않으며, 신규 번호만 append. 상세 규칙은 STEP 4-6.
 
 ---
 
@@ -531,8 +531,8 @@ commit 분기 결과와 무관하게 공통 다음 단계를 출력한다.
 
 ```
 다음 단계:
-  - 구현 진입:           /nidost:dev-from-ticket {번호 또는 v{버전}}
-  - 생성 티켓 수정·철회: /nidost:ticket-edit {번호}
+  - 구현 진입:           /mobiflow:dev-from-ticket {번호 또는 v{버전}}
+  - 생성 티켓 수정·철회: /mobiflow:ticket-edit {번호}
 ```
 
 > **참고**: 본 스킬은 신규 작성만 담당합니다. 방금 만든 티켓의 본문 보완·메타 변경(scope/domain/data_source/scr/kind)·의존 재배선·철회·분할/병합이 필요하면 `ticket-edit`을 사용하세요. 이미 `done`인 티켓의 보완은 본 스킬을 다시 호출해 후속 티켓((B) 케이스)으로 처리합니다.
@@ -543,8 +543,8 @@ commit 분기 결과와 무관하게 공통 다음 단계를 출력한다.
 
 > ⚠️ 위 다음 단계는 commit 정리 후 진행 가능합니다:
 >
-> - `/nidost:dev-from-ticket`은 STEP 0-5에서 `git status --porcelain`이 비어있지 않으면 abort
-> - `/nidost:ticket-edit`은 변경 파일을 추가로 만들어 working tree가 더 커집니다
+> - `/mobiflow:dev-from-ticket`은 STEP 0-5에서 `git status --porcelain`이 비어있지 않으면 abort
+> - `/mobiflow:ticket-edit`은 변경 파일을 추가로 만들어 working tree가 더 커집니다
 > - 진입 전 stash/commit으로 정리 필요
 
 본 스킬 종료.
